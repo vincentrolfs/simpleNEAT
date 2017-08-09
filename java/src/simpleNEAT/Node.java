@@ -3,7 +3,7 @@ package simpleNEAT;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Node {
+class Node {
 
     private int _innovationNumber;
     private double _activationSteepness;
@@ -12,10 +12,9 @@ public class Node {
     private Set<Integer> _connectedInto;
 
     /**
-     *
      * @param innovationNumber Must be non-negative.
      */
-    public Node(int innovationNumber, double activationSteepness, double bias, boolean disabled) {
+    Node(int innovationNumber, double activationSteepness, double bias, boolean disabled) {
         assert innovationNumber >= 0;
 
         _innovationNumber = innovationNumber;
@@ -25,35 +24,35 @@ public class Node {
         _connectedInto = new HashSet<>();
     }
 
-    public int getInnovationNumber() {
+    int getInnovationNumber() {
         return _innovationNumber;
     }
 
-    public double getActivationSteepness() {
+    double getActivationSteepness() {
         return _activationSteepness;
     }
 
-    public void setActivationSteepness(double activationSteepness) {
+    void setActivationSteepness(double activationSteepness) {
         _activationSteepness = activationSteepness;
     }
 
-    public double getBias() {
+    double getBias() {
         return _bias;
     }
 
-    public void setBias(double bias) {
+    void setBias(double bias) {
         _bias = bias;
     }
 
-    public boolean isDisabled() {
+    boolean isDisabled() {
         return _disabled;
     }
 
-    public void markConnectedInto(int nodeInnovationNumber) {
+    void markConnectedInto(int nodeInnovationNumber) {
         _connectedInto.add(nodeInnovationNumber);
     }
 
-    public boolean isConnectedInto(int nodeInnovationNumber) {
+    boolean isConnectedInto(int nodeInnovationNumber) {
         return _connectedInto.contains(nodeInnovationNumber);
     }
 }

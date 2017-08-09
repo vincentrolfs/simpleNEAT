@@ -1,6 +1,6 @@
 package simpleNEAT;
 
-public class Connection {
+class Connection {
 
     private int _innovationNumber;
     private int _nodeOutOf;
@@ -12,7 +12,7 @@ public class Connection {
      * @param nodeOutOf The innovation number of the node this connections goes out of. Must be non-negative.
      * @param nodeInto The innovation number of the node this connections goes into. Must be non-negative.
      */
-    public Connection(int innovationNumber, int nodeOutOf, int nodeInto, double weight, boolean disabled) {
+    Connection(int innovationNumber, int nodeOutOf, int nodeInto, double weight, boolean disabled) {
         assert innovationNumber >= 0;
 
         _innovationNumber = innovationNumber;
@@ -22,33 +22,33 @@ public class Connection {
         _disabled = disabled;
     }
 
-    public int getInnovationNumber() {
+    int getInnovationNumber() {
         return _innovationNumber;
     }
 
     /**
      * @return The innovation number of the node this connections goes out of.
      */
-    public int getNodeOutOf() {
+    int getNodeOutOf() {
         return _nodeOutOf;
     }
 
     /**
      * @return The innovation number of the node this connections goes into.
      */
-    public int getNodeInto() {
+    int getNodeInto() {
         return _nodeInto;
     }
 
-    public double getWeight() {
+    double getWeight() {
         return _weight;
     }
 
-    public void setWeight(double weight) {
+    void setWeight(double weight) {
         _weight = weight;
     }
 
-    public boolean isDisabled() {
+    boolean isDisabled() {
         return _disabled;
     }
 }

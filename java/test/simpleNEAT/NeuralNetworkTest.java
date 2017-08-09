@@ -16,7 +16,7 @@ class NeuralNetworkTest {
     private final LinkedList<Connection> _connectionsSorted;
     private final NeuralNetwork _network;
 
-    public NeuralNetworkTest() {
+    NeuralNetworkTest() {
         _node1 = new Node(12, -4, -9, false);
         _node2 = new Node(1, 2, 4, true);
         _node3 = new Node(7, -4, 1, false);
@@ -45,7 +45,7 @@ class NeuralNetworkTest {
     }
 
     @Test
-    void addsNodesCorrectly() {
+    void addsNodesAtTheEnd() {
         Node node4 = new Node(9, 23.1, 4, true);
         _network.addNode(node4);
 
@@ -60,7 +60,34 @@ class NeuralNetworkTest {
     }
 
     @Test
-    void addsConnectionAtCorrectPosition() {
-        // TODO
+    void addsConnectionsAtCorrectPosition() {
+        Connection connection1_3 = new Connection(2, 12, 7, 12.7, false);
+        Connection connection3_1 = new Connection(214, 7, 12, -1.1, false);
+        Connection connection2_2 = new Connection(130000, 1, 1, -8.0, false);
+        LinkedList<Connection> expectedConnectionsSorted = new LinkedList<Connection>() {{
+            add(connection1_3);
+            add(_connection1_2);
+            add(connection3_1);
+            add(_connection2_3);
+            add(connection2_2);
+        }};
+
+        _network.addConnection(connection3_1);
+        _network.addConnection(connection1_3);
+        _network.addConnection(connection2_2);
+
+        assertEquals(expectedConnectionsSorted, _network.getConnectionsSorted());
+    }
+
+    @Test
+    void marksRelevantNodesAsConnected() {
+        Connection connection1_3 = new Connection(2, 12, 7, 12.7, false);
+        Connection connection2_2 = new Connection(130000, 1, 1, -8.0, false);
+
+        _network.addConnection(connection1_3);
+        _network.addConnection(connection2_2);
+
+        assertTrue(_node1.isConnectedInto(7));
+        assertTrue(_node2.isConnectedInto(1));
     }
 }
