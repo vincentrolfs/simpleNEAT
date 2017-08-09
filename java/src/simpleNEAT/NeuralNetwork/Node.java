@@ -1,4 +1,4 @@
-package simpleNEAT;
+package simpleNEAT.NeuralNetwork;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -54,5 +54,9 @@ class Node {
 
     boolean isConnectedInto(int nodeInnovationNumber) {
         return _connectedInto.contains(nodeInnovationNumber);
+    }
+
+    int getAmountOfOutgoingConnections(){
+        return _connectedInto.size();
     }
 }

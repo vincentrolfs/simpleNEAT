@@ -1,4 +1,4 @@
-package simpleNEAT;
+package simpleNEAT.NeuralNetwork;
 
 class Connection {
 

@@ -1,8 +1,6 @@
-package simpleNEAT;
+package simpleNEAT.NeuralNetwork;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.ListIterator;
+import java.util.*;
 
 class NeuralNetwork {
 
@@ -12,11 +10,18 @@ class NeuralNetwork {
     private LinkedList<Connection> _connectionsSorted;
     private int _amountInputNodes;
     private int _amountOutputNodes;
+
+    private Map<Node, Set<Integer>> _connectionsLookup;
     private Double _fitness;
 
     /**
-     * @param nodes Format: input nodes, then output nodes, then hidden nodes. Nodes must be distinct. Must satisfy {@code nodes.size() >= 2}
-     * @param connectionsSorted Must be sorted by innovationNumber. Connections must be distinct. Must satisfy {@code connectionsSorted.size() >= 1}
+     * @param nodes Format: input nodes, then output nodes, then hidden nodes. Nodes must have distinct innovation numbers.
+     *              Must contain at least two nodes.
+     * @param connectionsSorted Must be sorted by innovationNumber. Connections must have distinct innovationNumbers.
+     *                          No two connections may both come out of the same node and go into the same node.
+     *                          Each connection must be marked in the respective node it goes
+     *                          out of via {@code node.isConnectedInto(...) == true}.
+     *                          Must contain at least two connections.
      * @param amountInputNodes Must be at least 1.
      * @param amountOutputNodes Must be at least 1.
      */
@@ -27,6 +32,8 @@ class NeuralNetwork {
         _connectionsSorted = connectionsSorted;
         _amountInputNodes = amountInputNodes;
         _amountOutputNodes = amountOutputNodes;
+
+        _connectionsLookup = new HashMap<>();
         _fitness = null;
     }
 
@@ -40,9 +47,11 @@ class NeuralNetwork {
 
     /**
      * Adds newNode to the nodes of this network. Ensures {@code getNodes().get(getNodes.size() - 1) == newNode}
-     * @param newNode Must have innovationNumber that is not already used in the nodes of this network
+     * @param newNode Must have innovationNumber that is not already used in the nodes of this network.
+     *                Require {@code newNode.getAmountOfOutgoingConnections() == 0}.
      */
     void addNode(Node newNode) {
+        assert newNode.getAmountOfOutgoingConnections() == 0;
         _nodes.add(newNode);
     }
 

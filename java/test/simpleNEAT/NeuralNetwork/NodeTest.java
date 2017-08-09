@@ -1,6 +1,8 @@
-package simpleNEAT;
+package simpleNEAT.NeuralNetwork;
 
 import org.junit.jupiter.api.Test;
+import simpleNEAT.NeuralNetwork.Node;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class NodeTest {
