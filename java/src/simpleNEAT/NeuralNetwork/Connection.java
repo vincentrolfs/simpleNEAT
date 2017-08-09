@@ -29,14 +29,14 @@ class Connection {
     /**
      * @return The innovation number of the node this connections goes out of.
      */
-    int getNodeOutOf() {
+    int getNodeOutOfId() {
         return _nodeOutOf;
     }
 
     /**
      * @return The innovation number of the node this connections goes into.
      */
-    int getNodeInto() {
+    int getNodeIntoId() {
         return _nodeInto;
     }
 

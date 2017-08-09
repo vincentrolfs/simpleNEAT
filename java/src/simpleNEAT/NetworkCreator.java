@@ -9,5 +9,4 @@ public class NetworkCreator {
     private double _defaultWeight;
 
     private double _nodeBiasMin;
-
 }

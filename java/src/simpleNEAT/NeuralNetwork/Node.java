@@ -9,7 +9,6 @@ class Node {
     private double _activationSteepness;
     private double _bias;
     private boolean _disabled;
-    private Set<Integer> _connectedInto;
 
     /**
      * @param innovationNumber Must be non-negative.
@@ -21,7 +20,6 @@ class Node {
         _activationSteepness = activationSteepness;
         _bias = bias;
         _disabled = disabled;
-        _connectedInto = new HashSet<>();
     }
 
     int getInnovationNumber() {
@@ -46,17 +44,5 @@ class Node {
 
     boolean isDisabled() {
         return _disabled;
-    }
-
-    void markConnectedInto(int nodeInnovationNumber) {
-        _connectedInto.add(nodeInnovationNumber);
-    }
-
-    boolean isConnectedInto(int nodeInnovationNumber) {
-        return _connectedInto.contains(nodeInnovationNumber);
-    }
-
-    int getAmountOfOutgoingConnections(){
-        return _connectedInto.size();
     }
 }

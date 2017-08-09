@@ -1,9 +1,6 @@
 package simpleNEAT.NeuralNetwork;
 
 import org.junit.jupiter.api.Test;
-import simpleNEAT.NeuralNetwork.Connection;
-import simpleNEAT.NeuralNetwork.NeuralNetwork;
-import simpleNEAT.NeuralNetwork.Node;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -26,9 +23,6 @@ class NeuralNetworkTest {
         _connection1_2 = new Connection(5, 12, 1, 0.6, false);
         _connection2_3 = new Connection(127684, 1, 7, 80, false);
 
-        _node1.markConnectedInto(1);
-        _node2.markConnectedInto(7);
-
         _nodes = new ArrayList<Node>(){{
             add(_node1);
             add(_node2);
@@ -42,9 +36,37 @@ class NeuralNetworkTest {
     }
 
     @Test
-    void constructsInstanceCorrectly() {
+    void constructsNodesCorrectly() {
         assertEquals(_nodes, _network.getNodes());
+    }
+
+    @Test
+    void constructsConnectionsCorrectly() {
         assertEquals(_connectionsSorted, _network.getConnectionsSorted());
+    }
+
+    @Test
+    void hasConnectionBetweenWorksCorrectlyAfterConstruction() {
+        assertTrue(_network.hasConnectionBetween(1, 7));
+        assertTrue(_network.hasConnectionBetween(12, 1));
+
+        assertFalse(_network.hasConnectionBetween(1, 1));
+        assertFalse(_network.hasConnectionBetween(1, 12));
+        assertFalse(_network.hasConnectionBetween(7, 1));
+        assertFalse(_network.hasConnectionBetween(7, 12));
+        assertFalse(_network.hasConnectionBetween(7, 7));
+        assertFalse(_network.hasConnectionBetween(12, 7));
+        assertFalse(_network.hasConnectionBetween(12, 12));
+    }
+
+    @Test
+    void nodeIdInNetworkWorksCorrectlyAfterConstruction() {
+        assertTrue(_network.nodeIdInNetwork(1));
+        assertTrue(_network.nodeIdInNetwork(12));
+        assertTrue(_network.nodeIdInNetwork(7));
+        assertFalse(_network.nodeIdInNetwork(0));
+        assertFalse(_network.nodeIdInNetwork(5));
+        assertFalse(_network.nodeIdInNetwork(127684));
     }
 
     @Test
@@ -60,6 +82,13 @@ class NeuralNetworkTest {
         }};
 
         assertEquals(expected, _network.getNodes());
+    }
+
+    @Test
+    void registersNodeId() {
+        Node node4 = new Node(9, 23.1, 4, true);
+        _network.addNode(node4);
+        assertTrue(_network.nodeIdInNetwork(9));
     }
 
     @Test
@@ -83,14 +112,14 @@ class NeuralNetworkTest {
     }
 
     @Test
-    void marksRelevantNodesAsConnected() {
+    void hasConnectionsBetweenTrueAfterAddingConnection() {
         Connection connection1_3 = new Connection(2, 12, 7, 12.7, false);
         Connection connection2_2 = new Connection(130000, 1, 1, -8.0, false);
 
         _network.addConnection(connection1_3);
         _network.addConnection(connection2_2);
 
-        assertTrue(_node1.isConnectedInto(7));
-        assertTrue(_node2.isConnectedInto(1));
+        assertTrue(_network.hasConnectionBetween(12, 7));
+        assertTrue(_network.hasConnectionBetween(1, 1));
     }
 }

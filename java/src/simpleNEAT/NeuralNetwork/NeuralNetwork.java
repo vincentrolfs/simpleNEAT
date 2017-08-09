@@ -11,16 +11,14 @@ class NeuralNetwork {
     private int _amountInputNodes;
     private int _amountOutputNodes;
 
-    private Map<Node, Set<Integer>> _connectionsLookup;
+    private Map<Integer, Set<Integer>> _connectedIntoLookup;
     private Double _fitness;
 
     /**
      * @param nodes Format: input nodes, then output nodes, then hidden nodes. Nodes must have distinct innovation numbers.
      *              Must contain at least two nodes.
-     * @param connectionsSorted Must be sorted by innovationNumber. Connections must have distinct innovationNumbers.
+     * @param connectionsSorted Connections must have distinct innovationNumbers.
      *                          No two connections may both come out of the same node and go into the same node.
-     *                          Each connection must be marked in the respective node it goes
-     *                          out of via {@code node.isConnectedInto(...) == true}.
      *                          Must contain at least two connections.
      * @param amountInputNodes Must be at least 1.
      * @param amountOutputNodes Must be at least 1.
@@ -28,13 +26,16 @@ class NeuralNetwork {
     NeuralNetwork(ArrayList<Node> nodes, LinkedList<Connection> connectionsSorted, int amountInputNodes, int amountOutputNodes) {
         assert nodes.size() >= 2 && connectionsSorted.size() >= 1 && amountInputNodes >= 1 && amountOutputNodes >= 1;
 
-        _nodes = nodes;
-        _connectionsSorted = connectionsSorted;
+        _nodes = new ArrayList<>();
+        _connectionsSorted = new LinkedList<>();
         _amountInputNodes = amountInputNodes;
         _amountOutputNodes = amountOutputNodes;
 
-        _connectionsLookup = new HashMap<>();
+        _connectedIntoLookup = new HashMap<>();
         _fitness = null;
+
+        initializeNodes(nodes);
+        initializeConnections(connectionsSorted);
     }
 
     ArrayList<Node> getNodes() {
@@ -48,35 +49,45 @@ class NeuralNetwork {
     /**
      * Adds newNode to the nodes of this network. Ensures {@code getNodes().get(getNodes.size() - 1) == newNode}
      * @param newNode Must have innovationNumber that is not already used in the nodes of this network.
-     *                Require {@code newNode.getAmountOfOutgoingConnections() == 0}.
      */
     void addNode(Node newNode) {
-        assert newNode.getAmountOfOutgoingConnections() == 0;
+        assert !nodeIdInNetwork(newNode.getInnovationNumber());
+
+        _connectedIntoLookup.put(newNode.getInnovationNumber(), new HashSet<>());
         _nodes.add(newNode);
     }
 
     /**
-     * Adds newConnection to the connections of this network at the appropriate position. Ensures {@code getConnectionsSorted().contains(newConnection)}.
-     * Ensures isConnectedInto() behaves correctly for affected nodes
-     * @param newConnection There must not exist a connection in the network with the same endpoints and the same direction.
-     *                      newConnection.getNodeOutOf() and .getNodeInto() must be innovation numbers of nodes present in the network.
+     * Adds newConnection to the connections of this network at the appropriate position.
+     * Ensures {@code hasConnectionBetween(newConnection.getNodeOutOfId(), newConnection.getNodeIntoId())}.
+     * @param newConnection There must not exist a connection in the network that comes out of the same node
+     *                      and goes into the same node as newConnection.
+     *                      Must fit the topology of the network, i.e. newConnection.getNodeOutOfId() and
+     *                      newConnection.getNodeIntoId() must be innovation numbers of nodes present in the network.
      */
     void addConnection(Connection newConnection) {
+        assert nodeIdInNetwork(newConnection.getNodeOutOfId()) && nodeIdInNetwork(newConnection.getNodeIntoId())
+                : "Connection does not fit the topology of the network";
+        assert !hasConnectionBetween(newConnection.getNodeOutOfId(), newConnection.getNodeIntoId())
+                : "There already exists a connection in the network that comes out of the same node and goes into the same node as the new connection";
+
         // Using iterators for better performance with LinkedList
         ListIterator<Connection> iterator = _connectionsSorted.listIterator();
         boolean connectionInserted = false;
 
-        while (iterator.hasNext()) {
-            Connection connection = iterator.next();
+        // Pre-check if newConnection has the highest innovationNumber ever seen for performance reasons
+        if (!hasHighestInnovationNumber(newConnection))
+        {
+            while (iterator.hasNext()) {
+                Connection connection = iterator.next();
 
-            assert connection.getNodeOutOf() != newConnection.getNodeOutOf() || connection.getNodeInto() != newConnection.getNodeInto()
-                    : "There must not exist a connection in the network with the same endpoints and the same direction";
-
-            if (!connectionInserted && connection.getInnovationNumber() >= newConnection.getInnovationNumber()) {
-                iterator.previous();
-                iterator.add(newConnection);
-                iterator.next();
-                connectionInserted = true;
+                if (connection.getInnovationNumber() >= newConnection.getInnovationNumber()) {
+                    iterator.previous();
+                    iterator.add(newConnection);
+                    iterator.next();
+                    connectionInserted = true;
+                    break;
+                }
             }
         }
 
@@ -84,29 +95,52 @@ class NeuralNetwork {
             _connectionsSorted.add(newConnection);
         }
 
-        markNodeOutOfConnected(newConnection);
-        checkIfNodeIntoExists(newConnection);
+        addConnectionToLookup(newConnection);
     }
 
-    private void markNodeOutOfConnected(Connection newConnection) {
-        for (Node node : _nodes) {
-            if (node.getInnovationNumber() == newConnection.getNodeOutOf()){
-                node.markConnectedInto(newConnection.getNodeInto());
-                return;
-            }
-        }
-
-        assert false : "Newly added connection does not fit the topology of the network: newConnection.getNodeOutOf() is not a node in this network.";
+    private boolean hasHighestInnovationNumber(Connection newConnection) {
+        int amountOfConnections = _connectionsSorted.size();
+        return amountOfConnections == 0 || _connectionsSorted.get(amountOfConnections - 1).getInnovationNumber() < newConnection.getInnovationNumber();
     }
 
-    private void checkIfNodeIntoExists(Connection newConnection) {
-        for (Node node : _nodes) {
-            if (node.getInnovationNumber() == newConnection.getNodeInto()){
-                return;
-            }
-        }
+    /**
+     * @param nodeOutOfId The innovation number of the node in the network that the connection in question goes out of.
+     * @param nodeIntoId The innovation number of a node in the network that the connection in question goes into.
+     */
+    boolean hasConnectionBetween(Integer nodeOutOfId, Integer nodeIntoId){
+        return     nodeIdInNetwork(nodeOutOfId)
+                && nodeIdInNetwork(nodeIntoId)
+                && _connectedIntoLookup.get(nodeOutOfId).contains(nodeIntoId);
+    }
 
-        assert false : "Newly added connection does not fit the topology of the network: newConnection.getNodeInto() is not a node in this network.";
+    /**
+     * @param nodeId The innovation number of a node.
+     */
+    boolean nodeIdInNetwork(Integer nodeId){
+        return _connectedIntoLookup.containsKey(nodeId);
+    }
+
+    private void initializeNodes(List<Node> nodes){
+        for (Node node : nodes){
+            addNode(node);
+        }
+    }
+
+    private void initializeConnections(List<Connection> connections){
+        for (Connection connection : connections){
+            addConnection(connection);
+        }
+    }
+
+    /**
+     * @param connection Must fit the topology of the network, i.e. newConnection.getNodeOutOfId() and
+     *                   newConnection.getNodeIntoId() must be innovation numbers of nodes present in the network.
+     */
+    private void addConnectionToLookup(Connection connection){
+        Integer nodeOutOfId = connection.getNodeOutOfId();
+        Integer nodeIntoId = connection.getNodeIntoId();
+
+        _connectedIntoLookup.get(nodeOutOfId).add(nodeIntoId);
     }
 
 }
