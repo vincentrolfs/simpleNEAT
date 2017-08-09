@@ -9,10 +9,11 @@ public class Node {
     private double _activationSteepness;
     private double _bias;
     private boolean _disabled;
-    private Set<Node> _connectedInto;
+    private Set<Integer> _connectedInto;
 
     /**
-     * @pre innovationNumber >= 0
+     *
+     * @param innovationNumber Must be non-negative.
      */
     public Node(int innovationNumber, double activationSteepness, double bias, boolean disabled) {
         assert innovationNumber >= 0;
@@ -48,15 +49,11 @@ public class Node {
         return _disabled;
     }
 
-    public void setDisabled(boolean disabled) {
-        _disabled = disabled;
+    public void markConnectedInto(int nodeInnovationNumber) {
+        _connectedInto.add(nodeInnovationNumber);
     }
 
-    public void markConnectedInto(Node node) {
-        _connectedInto.add(node);
-    }
-
-    public boolean isConnectedInto(Node node) {
-        return _connectedInto.contains(node);
+    public boolean isConnectedInto(int nodeInnovationNumber) {
+        return _connectedInto.contains(nodeInnovationNumber);
     }
 }

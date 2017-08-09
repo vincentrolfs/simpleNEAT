@@ -3,22 +3,21 @@ package simpleNEAT;
 public class Connection {
 
     private int _innovationNumber;
-    private int _nodeOut;
-    private int _nodeIn;
+    private int _nodeOutOf;
+    private int _nodeInto;
     private double _weight;
     private boolean _disabled;
 
     /**
-     * @param nodeOut The innovation number of the node this connections goes out of.
-     * @param nodeIn The innovation number of the node this connections goes into.
-     * @pre innovationNumber >= 0
+     * @param nodeOutOf The innovation number of the node this connections goes out of. Must be non-negative.
+     * @param nodeInto The innovation number of the node this connections goes into. Must be non-negative.
      */
-    public Connection(int innovationNumber, int nodeOut, int nodeIn, double weight, boolean disabled) {
+    public Connection(int innovationNumber, int nodeOutOf, int nodeInto, double weight, boolean disabled) {
         assert innovationNumber >= 0;
 
         _innovationNumber = innovationNumber;
-        _nodeOut = nodeOut;
-        _nodeIn = nodeIn;
+        _nodeOutOf = nodeOutOf;
+        _nodeInto = nodeInto;
         _weight = weight;
         _disabled = disabled;
     }
@@ -27,24 +26,18 @@ public class Connection {
         return _innovationNumber;
     }
 
-    public void setInnovationNumber(int innovationNumber) {
-        _innovationNumber = innovationNumber;
+    /**
+     * @return The innovation number of the node this connections goes out of.
+     */
+    public int getNodeOutOf() {
+        return _nodeOutOf;
     }
 
-    public int getNodeOut() {
-        return _nodeOut;
-    }
-
-    public void setNodeOut(int nodeOut) {
-        _nodeOut = nodeOut;
-    }
-
-    public int getNodeIn() {
-        return _nodeIn;
-    }
-
-    public void setNodeIn(int nodeIn) {
-        _nodeIn = nodeIn;
+    /**
+     * @return The innovation number of the node this connections goes into.
+     */
+    public int getNodeInto() {
+        return _nodeInto;
     }
 
     public double getWeight() {
@@ -57,9 +50,5 @@ public class Connection {
 
     public boolean isDisabled() {
         return _disabled;
-    }
-
-    public void setDisabled(boolean disabled) {
-        _disabled = disabled;
     }
 }
