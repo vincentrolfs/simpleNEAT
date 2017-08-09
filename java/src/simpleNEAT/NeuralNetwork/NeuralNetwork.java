@@ -17,9 +17,8 @@ class NeuralNetwork {
     /**
      * @param nodes Format: input nodes, then output nodes, then hidden nodes. Nodes must have distinct innovation numbers.
      *              Must contain at least two nodes.
-     * @param connectionsSorted Connections must have distinct innovationNumbers.
-     *                          No two connections may both come out of the same node and go into the same node.
-     *                          Must contain at least two connections.
+     * @param connectionsSorted Must be sorted by innovationNumber. No two connections may both come out of the same
+     *                          node and go into the same node. Must contain at least two connections.
      * @param amountInputNodes Must be at least 1.
      * @param amountOutputNodes Must be at least 1.
      */
@@ -51,7 +50,7 @@ class NeuralNetwork {
      * @param newNode Must have innovationNumber that is not already used in the nodes of this network.
      */
     void addNode(Node newNode) {
-        assert !nodeIdInNetwork(newNode.getInnovationNumber());
+        assert !nodeIdInNetwork(newNode.getInnovationNumber()) : "Saw same node innovationNumber twice";
 
         _connectedIntoLookup.put(newNode.getInnovationNumber(), new HashSet<>());
         _nodes.add(newNode);
@@ -66,41 +65,27 @@ class NeuralNetwork {
      *                      newConnection.getNodeIntoId() must be innovation numbers of nodes present in the network.
      */
     void addConnection(Connection newConnection) {
-        assert nodeIdInNetwork(newConnection.getNodeOutOfId()) && nodeIdInNetwork(newConnection.getNodeIntoId())
-                : "Connection does not fit the topology of the network";
-        assert !hasConnectionBetween(newConnection.getNodeOutOfId(), newConnection.getNodeIntoId())
-                : "There already exists a connection in the network that comes out of the same node and goes into the same node as the new connection";
+        validateConnection(newConnection);
 
         // Using iterators for better performance with LinkedList
-        ListIterator<Connection> iterator = _connectionsSorted.listIterator();
-        boolean connectionInserted = false;
+        ListIterator<Connection> iterator = _connectionsSorted.listIterator(_connectionsSorted.size());
 
-        // Pre-check if newConnection has the highest innovationNumber ever seen for performance reasons
-        if (!hasHighestInnovationNumber(newConnection))
-        {
-            while (iterator.hasNext()) {
-                Connection connection = iterator.next();
+        while (iterator.hasPrevious()) {
+            Connection connection = iterator.previous();
 
-                if (connection.getInnovationNumber() >= newConnection.getInnovationNumber()) {
-                    iterator.previous();
-                    iterator.add(newConnection);
-                    iterator.next();
-                    connectionInserted = true;
-                    break;
-                }
+            if (connection.getInnovationNumber() < newConnection.getInnovationNumber()) {
+                iterator.next();
+                iterator.add(newConnection);
+                iterator.previous();
+                break;
             }
         }
 
-        if (!connectionInserted) {
-            _connectionsSorted.add(newConnection);
+        if (!iterator.hasPrevious()) {
+            iterator.add(newConnection);
         }
 
         addConnectionToLookup(newConnection);
-    }
-
-    private boolean hasHighestInnovationNumber(Connection newConnection) {
-        int amountOfConnections = _connectionsSorted.size();
-        return amountOfConnections == 0 || _connectionsSorted.get(amountOfConnections - 1).getInnovationNumber() < newConnection.getInnovationNumber();
     }
 
     /**
@@ -120,16 +105,30 @@ class NeuralNetwork {
         return _connectedIntoLookup.containsKey(nodeId);
     }
 
-    private void initializeNodes(List<Node> nodes){
+    private void initializeNodes(ArrayList<Node> nodes){
         for (Node node : nodes){
             addNode(node);
         }
     }
 
-    private void initializeConnections(List<Connection> connections){
-        for (Connection connection : connections){
-            addConnection(connection);
+    private void initializeConnections(LinkedList<Connection> connectionsSorted){
+        int previousInnovationNumber = Integer.MIN_VALUE;
+        for (Connection connection : connectionsSorted) {
+            assert connection.getInnovationNumber() > previousInnovationNumber : "Connections not sorted by innovation number";
+
+            previousInnovationNumber = connection.getInnovationNumber();
+            validateConnection(connection);
+            addConnectionToLookup(connection);
         }
+
+        _connectionsSorted = connectionsSorted;
+    }
+
+    private void validateConnection(Connection connection){
+        assert nodeIdInNetwork(connection.getNodeOutOfId()) && nodeIdInNetwork(connection.getNodeIntoId())
+                : "Connection does not fit the topology of the network";
+        assert !hasConnectionBetween(connection.getNodeOutOfId(), connection.getNodeIntoId())
+                : "There already exists a connection in the network that comes out of the same node and goes into the same node as the new connection";
     }
 
     /**

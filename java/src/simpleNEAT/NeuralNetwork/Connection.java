@@ -1,6 +1,6 @@
 package simpleNEAT.NeuralNetwork;
 
-class Connection {
+public class Connection {
 
     private int _innovationNumber;
     private int _nodeOutOf;
@@ -12,7 +12,7 @@ class Connection {
      * @param nodeOutOf The innovation number of the node this connections goes out of. Must be non-negative.
      * @param nodeInto The innovation number of the node this connections goes into. Must be non-negative.
      */
-    Connection(int innovationNumber, int nodeOutOf, int nodeInto, double weight, boolean disabled) {
+    public Connection(int innovationNumber, int nodeOutOf, int nodeInto, double weight, boolean disabled) {
         assert innovationNumber >= 0;
 
         _innovationNumber = innovationNumber;

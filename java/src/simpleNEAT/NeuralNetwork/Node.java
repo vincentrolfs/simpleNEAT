@@ -3,7 +3,7 @@ package simpleNEAT.NeuralNetwork;
 import java.util.HashSet;
 import java.util.Set;
 
-class Node {
+public class Node {
 
     private int _innovationNumber;
     private double _activationSteepness;
@@ -13,7 +13,7 @@ class Node {
     /**
      * @param innovationNumber Must be non-negative.
      */
-    Node(int innovationNumber, double activationSteepness, double bias, boolean disabled) {
+    public Node(int innovationNumber, double activationSteepness, double bias, boolean disabled) {
         assert innovationNumber >= 0;
 
         _innovationNumber = innovationNumber;
