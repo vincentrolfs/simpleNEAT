@@ -22,27 +22,27 @@ public class Node {
         _disabled = disabled;
     }
 
-    int getInnovationNumber() {
+    public int getInnovationNumber() {
         return _innovationNumber;
     }
 
-    double getActivationSteepness() {
+    public double getActivationSteepness() {
         return _activationSteepness;
     }
 
-    void setActivationSteepness(double activationSteepness) {
+    public void setActivationSteepness(double activationSteepness) {
         _activationSteepness = activationSteepness;
     }
 
-    double getBias() {
+    public double getBias() {
         return _bias;
     }
 
-    void setBias(double bias) {
+    public void setBias(double bias) {
         _bias = bias;
     }
 
-    boolean isDisabled() {
+    public boolean isDisabled() {
         return _disabled;
     }
 }

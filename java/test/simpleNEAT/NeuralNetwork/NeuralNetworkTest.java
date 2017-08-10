@@ -1,5 +1,6 @@
 package simpleNEAT.NeuralNetwork;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -12,11 +13,12 @@ class NeuralNetworkTest {
 
     private Node _node1, _node2, _node3;
     private Connection _connection1_2, _connection2_3;
-    private final ArrayList<Node> _nodes;
-    private final LinkedList<Connection> _connectionsSorted;
-    private final NeuralNetwork _network;
+    private ArrayList<Node> _nodes;
+    private LinkedList<Connection> _connectionsSorted;
+    private NeuralNetwork _network;
 
-    NeuralNetworkTest() {
+    @BeforeEach
+    void setUp() {
         _node1 = new Node(12, -4, -9, false);
         _node2 = new Node(1, 2, 4, true);
         _node3 = new Node(7, -4, 1, false);

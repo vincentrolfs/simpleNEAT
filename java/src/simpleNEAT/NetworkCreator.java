@@ -39,19 +39,21 @@ public class NetworkCreator {
         _defaultNodeActivationSteepness = defaultNodeActivationSteepness;
     }
 
+    /**
+     * @return A non-disabled none with the default attributes.
+     */
     Node createNodeWithDefaultAttributes(int innovationNumber){
         return new Node(innovationNumber, _defaultNodeActivationSteepness, _defaultNodeBias, false);
     }
 
+    /**
+     * @return A non-disabled connection with a random connection weight from the specified range.
+     */
     Connection createConnectionWithRandomWeight(int innovationNumber, int nodeOutOf, int nodeInto){
-        return new Connection(innovationNumber, nodeOutOf, nodeInto, getRandomWeight(), false);
+        return new Connection(innovationNumber, nodeOutOf, nodeInto, getRandomConnectionWeight(), false);
     }
 
-    double getRandomWeight(){
-        return getRandomDouble(_connectionWeightMin, _connectionWeightMax);
-    }
-
-    private double getRandomDouble(double min, double max){
-        return RandomUtil.generator.nextDouble() * (max - min) + min;
+    double getRandomConnectionWeight(){
+        return RandomUtil.getRandomDouble(_connectionWeightMin, _connectionWeightMax);
     }
 }
