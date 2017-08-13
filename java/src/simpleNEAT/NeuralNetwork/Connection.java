@@ -22,33 +22,33 @@ public class Connection {
         _disabled = disabled;
     }
 
-    int getInnovationNumber() {
+    public int getInnovationNumber() {
         return _innovationNumber;
     }
 
     /**
      * @return The innovation number of the node this connections goes out of.
      */
-    int getNodeOutOfId() {
+    public int getNodeOutOfId() {
         return _nodeOutOf;
     }
 
     /**
      * @return The innovation number of the node this connections goes into.
      */
-    int getNodeIntoId() {
+    public int getNodeIntoId() {
         return _nodeInto;
     }
 
-    double getWeight() {
+    public double getWeight() {
         return _weight;
     }
 
-    void setWeight(double weight) {
+    public void setWeight(double weight) {
         _weight = weight;
     }
 
-    boolean isDisabled() {
+    public boolean isDisabled() {
         return _disabled;
     }
 }

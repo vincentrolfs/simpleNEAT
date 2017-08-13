@@ -63,12 +63,12 @@ class NeuralNetworkTest {
 
     @Test
     void nodeIdInNetworkWorksCorrectlyAfterConstruction() {
-        assertTrue(_network.nodeIdInNetwork(1));
-        assertTrue(_network.nodeIdInNetwork(12));
-        assertTrue(_network.nodeIdInNetwork(7));
-        assertFalse(_network.nodeIdInNetwork(0));
-        assertFalse(_network.nodeIdInNetwork(5));
-        assertFalse(_network.nodeIdInNetwork(127684));
+        assertTrue(_network.isNodeIdInNetwork(1));
+        assertTrue(_network.isNodeIdInNetwork(12));
+        assertTrue(_network.isNodeIdInNetwork(7));
+        assertFalse(_network.isNodeIdInNetwork(0));
+        assertFalse(_network.isNodeIdInNetwork(5));
+        assertFalse(_network.isNodeIdInNetwork(127684));
     }
 
     @Test
@@ -90,7 +90,7 @@ class NeuralNetworkTest {
     void registersNodeId() {
         Node node4 = new Node(9, 23.1, 4, true);
         _network.addNode(node4);
-        assertTrue(_network.nodeIdInNetwork(9));
+        assertTrue(_network.isNodeIdInNetwork(9));
     }
 
     @Test

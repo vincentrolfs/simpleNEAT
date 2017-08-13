@@ -1,5 +1,6 @@
 package simpleNEAT;
 
+import java.util.List;
 import java.util.Random;
 
 class RandomUtil {
@@ -13,4 +14,23 @@ class RandomUtil {
         return generator.nextDouble() * (max - min) + min;
     }
 
+    /**
+     * Generates random boolean with given probability.
+     * @param probability Must be between 0 and 1 inclusive.
+     */
+    static boolean getRandomBoolean(double probability){
+        return generator.nextDouble() <= probability;
+    }
+
+    /**
+     * Returns a random value from the list. Returns null if list is empty.
+     */
+    static <T> T sampleFrom(List<T> list){
+        if (list.size() == 0){
+            return null;
+        }
+
+        int index = generator.nextInt(list.size());
+        return list.get(index);
+    }
 }

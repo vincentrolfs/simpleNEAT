@@ -2,9 +2,9 @@ package simpleNEAT.NeuralNetwork;
 
 import java.util.*;
 
-class NeuralNetwork {
+public class NeuralNetwork {
 
-    // Format for nodes: Input nodes, then output nodes, then hidden nodes. Require ArrayList for perfromance reasons
+    // Format for nodes: Input nodes, then output nodes, then hidden nodes. Require ArrayList for performance reasons
     private ArrayList<Node> _nodes;
     // Require LinkedList for performance reasons
     private LinkedList<Connection> _connectionsSorted;
@@ -22,7 +22,7 @@ class NeuralNetwork {
      * @param amountInputNodes Must be at least 1.
      * @param amountOutputNodes Must be at least 1.
      */
-    NeuralNetwork(ArrayList<Node> nodes, LinkedList<Connection> connectionsSorted, int amountInputNodes, int amountOutputNodes) {
+    public NeuralNetwork(ArrayList<Node> nodes, LinkedList<Connection> connectionsSorted, int amountInputNodes, int amountOutputNodes) {
         assert nodes.size() >= 2 && connectionsSorted.size() >= 1 && amountInputNodes >= 1 && amountOutputNodes >= 1;
 
         _nodes = new ArrayList<>();
@@ -37,11 +37,11 @@ class NeuralNetwork {
         initializeConnections(connectionsSorted);
     }
 
-    ArrayList<Node> getNodes() {
+    public ArrayList<Node> getNodes() {
         return _nodes;
     }
 
-    LinkedList<Connection> getConnectionsSorted() {
+    public LinkedList<Connection> getConnectionsSorted() {
         return _connectionsSorted;
     }
 
@@ -49,8 +49,8 @@ class NeuralNetwork {
      * Adds newNode to the nodes of this network. Ensures {@code getNodes().get(getNodes.size() - 1) == newNode}
      * @param newNode Must have innovationNumber that is not already used in the nodes of this network.
      */
-    void addNode(Node newNode) {
-        assert !nodeIdInNetwork(newNode.getInnovationNumber()) : "Saw same node innovationNumber twice";
+    public void addNode(Node newNode) {
+        assert !isNodeIdInNetwork(newNode.getInnovationNumber()) : "Saw same node innovationNumber twice";
 
         _connectedIntoLookup.put(newNode.getInnovationNumber(), new HashSet<>());
         _nodes.add(newNode);
@@ -64,7 +64,7 @@ class NeuralNetwork {
      *                      Must fit the topology of the network, i.e. newConnection.getNodeOutOfId() and
      *                      newConnection.getNodeIntoId() must be innovation numbers of nodes present in the network.
      */
-    void addConnection(Connection newConnection) {
+    public void addConnection(Connection newConnection) {
         validateConnection(newConnection);
 
         // Using iterators for better performance with LinkedList
@@ -92,16 +92,16 @@ class NeuralNetwork {
      * @param nodeOutOfId The innovation number of the node in the network that the connection in question goes out of.
      * @param nodeIntoId The innovation number of a node in the network that the connection in question goes into.
      */
-    boolean hasConnectionBetween(Integer nodeOutOfId, Integer nodeIntoId){
-        return     nodeIdInNetwork(nodeOutOfId)
-                && nodeIdInNetwork(nodeIntoId)
+    public boolean hasConnectionBetween(Integer nodeOutOfId, Integer nodeIntoId){
+        return     isNodeIdInNetwork(nodeOutOfId)
+                && isNodeIdInNetwork(nodeIntoId)
                 && _connectedIntoLookup.get(nodeOutOfId).contains(nodeIntoId);
     }
 
     /**
      * @param nodeId The innovation number of a node.
      */
-    boolean nodeIdInNetwork(Integer nodeId){
+    public boolean isNodeIdInNetwork(Integer nodeId){
         return _connectedIntoLookup.containsKey(nodeId);
     }
 
@@ -125,7 +125,7 @@ class NeuralNetwork {
     }
 
     private void validateConnection(Connection connection){
-        assert nodeIdInNetwork(connection.getNodeOutOfId()) && nodeIdInNetwork(connection.getNodeIntoId())
+        assert isNodeIdInNetwork(connection.getNodeOutOfId()) && isNodeIdInNetwork(connection.getNodeIntoId())
                 : "Connection does not fit the topology of the network";
         assert !hasConnectionBetween(connection.getNodeOutOfId(), connection.getNodeIntoId())
                 : "There already exists a connection in the network that comes out of the same node and goes into the same node as the new connection";

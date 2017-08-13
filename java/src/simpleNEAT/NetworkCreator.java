@@ -49,8 +49,8 @@ public class NetworkCreator {
     /**
      * @return A non-disabled connection with a random connection weight from the specified range.
      */
-    Connection createConnectionWithRandomWeight(int innovationNumber, int nodeOutOf, int nodeInto){
-        return new Connection(innovationNumber, nodeOutOf, nodeInto, getRandomConnectionWeight(), false);
+    Connection createConnectionWithRandomWeight(int innovationNumber, int nodeOutOfId, int nodeIntoId){
+        return new Connection(innovationNumber, nodeOutOfId, nodeIntoId, getRandomConnectionWeight(), false);
     }
 
     double getRandomConnectionWeight(){
