@@ -25,16 +25,13 @@ public class NeuralNetwork {
     public NeuralNetwork(ArrayList<Node> nodes, LinkedList<Connection> connectionsSorted, int amountInputNodes, int amountOutputNodes) {
         assert nodes.size() >= 2 && connectionsSorted.size() >= 1 && amountInputNodes >= 1 && amountOutputNodes >= 1;
 
-        _nodes = new ArrayList<>();
-        _connectionsSorted = new LinkedList<>();
+        initializeNodes(nodes);
+        initializeConnections(connectionsSorted);
+
         _amountInputNodes = amountInputNodes;
         _amountOutputNodes = amountOutputNodes;
 
-        _connectedIntoLookup = new HashMap<>();
         _fitness = null;
-
-        initializeNodes(nodes);
-        initializeConnections(connectionsSorted);
     }
 
     public ArrayList<Node> getNodes() {
@@ -106,6 +103,9 @@ public class NeuralNetwork {
     }
 
     private void initializeNodes(ArrayList<Node> nodes){
+        _nodes = new ArrayList<>();
+        _connectedIntoLookup = new HashMap<>();
+
         for (Node node : nodes){
             addNode(node);
         }

@@ -2,8 +2,7 @@ package simpleNEAT;
 import simpleNEAT.Innovation.*;
 import simpleNEAT.NeuralNetwork.*;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class NetworkMutator {
 
@@ -16,14 +15,29 @@ public class NetworkMutator {
 
     int _connectionMutationMaxTries;
     boolean _fallBackToWeightMutationOnConnectionMutationFail;
-    double _weightPerturbanceMagnitude;
 
-    int _currentGeneration;
-    Map<Innovation, Integer> _innovationNumbers;
-    int _latestInnovationNumber;
+    double _connectionWeightPerturbanceMagnitude;
+    double _nodeBiasPerturbanceMagnitude;
+    double _nodeActivationSteepnessPerturbanceMagnitude;
+
+    public NetworkMutator(NetworkCreator networkCreator, double weightMutationProbability, double nodeParameterMutationProbability, double addNodeMutationProbability, double addConnectionMutationProbability, int connectionMutationMaxTries, boolean fallBackToWeightMutationOnConnectionMutationFail, double connectionWeightPerturbanceMagnitude, double nodeBiasPerturbanceMagnitude, double nodeActivationSteepnessPerturbanceMagnitude) {
+        _networkCreator = networkCreator;
+
+        _weightMutationProbability = weightMutationProbability;
+        _nodeParameterMutationProbability = nodeParameterMutationProbability;
+        _addNodeMutationProbability = addNodeMutationProbability;
+        _addConnectionMutationProbability = addConnectionMutationProbability;
+
+        _connectionMutationMaxTries = connectionMutationMaxTries;
+        _fallBackToWeightMutationOnConnectionMutationFail = fallBackToWeightMutationOnConnectionMutationFail;
+
+        _connectionWeightPerturbanceMagnitude = connectionWeightPerturbanceMagnitude;
+        _nodeBiasPerturbanceMagnitude = nodeBiasPerturbanceMagnitude;
+        _nodeActivationSteepnessPerturbanceMagnitude = nodeActivationSteepnessPerturbanceMagnitude;
+    }
 
     /**
-     *
+     * Introduces mutation into network by random chance. It is possible that no mutation occurs.
      * @param network Must contain at least two nodes and one connection.
      */
     public void maybeMutate(NeuralNetwork network) {
@@ -70,34 +84,16 @@ public class NetworkMutator {
     }
 
     private void addConnection(NeuralNetwork network, int nodeOutOfId, int nodeIntoId) {
-        ConnectionInnovation innovation = new ConnectionInnovation(_currentGeneration, nodeOutOfId, nodeIntoId);
-        int innovationNumber = determineInnovationNumber(innovation);
-        Connection newConnection = _networkCreator.createConnectionWithRandomWeight(
-                innovationNumber, nodeOutOfId, nodeIntoId
-        );
-
+        Connection newConnection = _networkCreator.createNewConnection(nodeOutOfId, nodeIntoId);
         network.addConnection(newConnection);
     }
 
 
     private void performAddNodeMutation(NeuralNetwork network) {
         Connection connectionToSplit = RandomUtil.sampleFrom(network.getConnectionsSorted());
-        NodeInnovation innovation = new NodeInnovation(_currentGeneration, connectionToSplit.getInnovationNumber());
-        int innovationNumber = determineInnovationNumber(innovation);
-        Node newNode = _networkCreator.createNodeWithDefaultAttributes(innovationNumber);
+        int connectionToSplitId = connectionToSplit.getInnovationNumber();
+        Node newNode = _networkCreator.createNewNode(connectionToSplitId);
 
         network.addNode(newNode);
-    }
-
-    private int determineInnovationNumber(Innovation innovation){
-        Integer innovationNumber = _innovationNumbers.get(innovation);
-
-        if (innovationNumber == null){
-            _latestInnovationNumber++;
-            innovationNumber = _latestInnovationNumber;
-            _innovationNumbers.put(innovation, innovationNumber);
-        }
-
-        return innovationNumber;
     }
 }

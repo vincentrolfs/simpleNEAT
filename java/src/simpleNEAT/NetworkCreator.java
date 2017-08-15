@@ -1,5 +1,13 @@
 package simpleNEAT;
+import simpleNEAT.Innovation.ConnectionInnovation;
+import simpleNEAT.Innovation.Innovation;
+import simpleNEAT.Innovation.NodeInnovation;
 import simpleNEAT.NeuralNetwork.*;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 public class NetworkCreator {
     private int _amountInputNodes;
@@ -16,16 +24,27 @@ public class NetworkCreator {
     private double _nodeActivationSteepnessMax;
     private double _defaultNodeActivationSteepness;
 
+    private int _amountOfGenerationsRememberedForInnovationNumbers;
+
+    int _currentGeneration;
+    HashMap<Innovation, Integer> _innovationNumbers;
+    int _latestInnovationNumber;
+
     /**
      * @param amountInputNodes Must be at least 1.
      * @param amountOutputNodes Must be at least 1.
      * @param connectionWeightMin Must satisfy {@code connectionWeightMin <= connectionWeightMax}.
      * @param nodeBiasMin Must satisfy {@code nodeBiasMin <= nodeBiasMax}.
      * @param nodeActivationSteepnessMin Must satisfy {@code nodeActivationSteepnessMin <= nodeActivationSteepnessMax}.
+     * @param amountOfGenerationsRememberedForInnovationNumbers Must be non-negative.
      */
-    public NetworkCreator(int amountInputNodes, int amountOutputNodes, double connectionWeightMin, double connectionWeightMax, double nodeBiasMin, double nodeBiasMax, double defaultNodeBias, double nodeActivationSteepnessMin, double nodeActivationSteepnessMax, double defaultNodeActivationSteepness) {
-        assert amountInputNodes >= 1 && amountOutputNodes >= 1 && connectionWeightMin <= connectionWeightMax &&
-                nodeBiasMin <= nodeBiasMax && nodeActivationSteepnessMin <= nodeActivationSteepnessMax;
+    public NetworkCreator(int amountInputNodes, int amountOutputNodes, double connectionWeightMin, double connectionWeightMax, double nodeBiasMin, double nodeBiasMax, double defaultNodeBias, double nodeActivationSteepnessMin, double nodeActivationSteepnessMax, double defaultNodeActivationSteepness, int amountOfGenerationsRememberedForInnovationNumbers) {
+        assert amountInputNodes >= 1 &&
+                amountOutputNodes >= 1 &&
+                connectionWeightMin <= connectionWeightMax &&
+                nodeBiasMin <= nodeBiasMax &&
+                nodeActivationSteepnessMin <= nodeActivationSteepnessMax &&
+                amountOfGenerationsRememberedForInnovationNumbers >= 0;
 
         _amountInputNodes = amountInputNodes;
         _amountOutputNodes = amountOutputNodes;
@@ -37,23 +56,70 @@ public class NetworkCreator {
         _nodeActivationSteepnessMin = nodeActivationSteepnessMin;
         _nodeActivationSteepnessMax = nodeActivationSteepnessMax;
         _defaultNodeActivationSteepness = defaultNodeActivationSteepness;
+
+        _amountOfGenerationsRememberedForInnovationNumbers = amountOfGenerationsRememberedForInnovationNumbers;
+
+        _currentGeneration = 0;
+        _innovationNumbers = new HashMap<>();
+        _latestInnovationNumber = 1;
+    }
+
+    void nextGeneration(){
+        _currentGeneration++;
+
+        Set<Map.Entry<Innovation, Integer>> entrySet = _innovationNumbers.entrySet();
+        Iterator<Map.Entry<Innovation, Integer>> iterator = entrySet.iterator();
+
+        while (iterator.hasNext()) {
+            Innovation someInnovation = iterator.next().getKey();
+            int generationsPassed = _currentGeneration - someInnovation.getGenerationCreated();
+
+            if (generationsPassed > _amountOfGenerationsRememberedForInnovationNumbers){
+                iterator.remove();
+            }
+        }
     }
 
     /**
-     * @return A non-disabled none with the default attributes.
+     * Creates a non-disabled connection with random weight and the correct innovation number.
+     * @param nodeOutOfId Must be non-negative.
+     * @param nodeIntoId Must be non-negative.
      */
-    Node createNodeWithDefaultAttributes(int innovationNumber){
-        return new Node(innovationNumber, _defaultNodeActivationSteepness, _defaultNodeBias, false);
+    Connection createNewConnection(int nodeOutOfId, int nodeIntoId){
+        ConnectionInnovation innovation = new ConnectionInnovation(_currentGeneration, nodeOutOfId, nodeIntoId);
+        int innovationNumber = determineInnovationNumber(innovation);
+        Connection newConnection = new Connection(
+                innovationNumber, nodeOutOfId, nodeIntoId, getRandomConnectionWeight(), false
+        );
+
+        return newConnection;
     }
 
     /**
-     * @return A non-disabled connection with a random connection weight from the specified range.
+     * Creates a new node with default attributes and the correct innovation number.
+     * @param connectionSplitId Must be non-negative.
      */
-    Connection createConnectionWithRandomWeight(int innovationNumber, int nodeOutOfId, int nodeIntoId){
-        return new Connection(innovationNumber, nodeOutOfId, nodeIntoId, getRandomConnectionWeight(), false);
+    Node createNewNode(int connectionSplitId){
+        NodeInnovation innovation = new NodeInnovation(_currentGeneration, connectionSplitId);
+        int innovationNumber = determineInnovationNumber(innovation);
+        Node newNode = new Node(innovationNumber, _defaultNodeActivationSteepness, _defaultNodeBias, false);
+
+        return newNode;
     }
 
     double getRandomConnectionWeight(){
         return RandomUtil.getRandomDouble(_connectionWeightMin, _connectionWeightMax);
+    }
+
+    private int determineInnovationNumber(Innovation innovation){
+        Integer innovationNumber = _innovationNumbers.get(innovation);
+
+        if (innovationNumber == null){
+            _latestInnovationNumber++;
+            innovationNumber = _latestInnovationNumber;
+            _innovationNumbers.put(innovation, innovationNumber);
+        }
+
+        return innovationNumber;
     }
 }
