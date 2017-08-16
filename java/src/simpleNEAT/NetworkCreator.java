@@ -64,6 +64,16 @@ public class NetworkCreator {
         _latestInnovationNumber = 1;
     }
 
+    /**
+     * Registers the innovation for the NetworkCreator. Created for testing purposes.
+     */
+    void registerInnovation(Innovation innovation){
+        if (!_innovationNumbers.containsKey(innovation)){
+            _latestInnovationNumber++;
+            _innovationNumbers.put(innovation, _latestInnovationNumber);
+        }
+    }
+
     void nextGeneration(){
         _currentGeneration++;
 
@@ -85,7 +95,7 @@ public class NetworkCreator {
      * @param nodeOutOfId Must be non-negative.
      * @param nodeIntoId Must be non-negative.
      */
-    Connection createNewConnection(int nodeOutOfId, int nodeIntoId){
+    Connection createConnectionWithRandomWeight(int nodeOutOfId, int nodeIntoId){
         ConnectionInnovation innovation = new ConnectionInnovation(_currentGeneration, nodeOutOfId, nodeIntoId);
         int innovationNumber = determineInnovationNumber(innovation);
         Connection newConnection = new Connection(
@@ -99,7 +109,7 @@ public class NetworkCreator {
      * Creates a new node with default attributes and the correct innovation number.
      * @param connectionSplitId Must be non-negative.
      */
-    Node createNewNode(int connectionSplitId){
+    Node createNodeWithDefaultAttributes(int connectionSplitId){
         NodeInnovation innovation = new NodeInnovation(_currentGeneration, connectionSplitId);
         int innovationNumber = determineInnovationNumber(innovation);
         Node newNode = new Node(innovationNumber, _defaultNodeActivationSteepness, _defaultNodeBias, false);
@@ -112,14 +122,7 @@ public class NetworkCreator {
     }
 
     private int determineInnovationNumber(Innovation innovation){
-        Integer innovationNumber = _innovationNumbers.get(innovation);
-
-        if (innovationNumber == null){
-            _latestInnovationNumber++;
-            innovationNumber = _latestInnovationNumber;
-            _innovationNumbers.put(innovation, innovationNumber);
-        }
-
-        return innovationNumber;
+        registerInnovation(innovation);
+        return _innovationNumbers.get(innovation);
     }
 }

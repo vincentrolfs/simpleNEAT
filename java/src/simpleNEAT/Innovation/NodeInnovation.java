@@ -5,7 +5,7 @@ public class NodeInnovation extends Innovation {
     private int _connectionSplitId;
 
     /**
-     * @param generationCreated The generation in which this innovation was created. Must be non-negative.
+     * @param generationCreated Must benon
      * @param connectionSplitId Must be non-negative.
      */
     public NodeInnovation(int generationCreated, int connectionSplitId) {

@@ -1,5 +1,4 @@
 package simpleNEAT;
-import simpleNEAT.Innovation.*;
 import simpleNEAT.NeuralNetwork.*;
 
 import java.util.*;
@@ -71,7 +70,7 @@ public class NetworkMutator {
             nodeOutOfId = RandomUtil.sampleFrom(nodes).getInnovationNumber();
             nodeIntoId = RandomUtil.sampleFrom(nodes).getInnovationNumber();
 
-            if (network.hasConnectionBetween(nodeOutOfId, nodeIntoId)){
+            if (!network.hasConnectionBetween(nodeOutOfId, nodeIntoId)){
                 newConnectionIdentified = true;
             }
         }
@@ -84,7 +83,7 @@ public class NetworkMutator {
     }
 
     private void addConnection(NeuralNetwork network, int nodeOutOfId, int nodeIntoId) {
-        Connection newConnection = _networkCreator.createNewConnection(nodeOutOfId, nodeIntoId);
+        Connection newConnection = _networkCreator.createConnectionWithRandomWeight(nodeOutOfId, nodeIntoId);
         network.addConnection(newConnection);
     }
 
@@ -92,7 +91,7 @@ public class NetworkMutator {
     private void performAddNodeMutation(NeuralNetwork network) {
         Connection connectionToSplit = RandomUtil.sampleFrom(network.getConnectionsSorted());
         int connectionToSplitId = connectionToSplit.getInnovationNumber();
-        Node newNode = _networkCreator.createNewNode(connectionToSplitId);
+        Node newNode = _networkCreator.createNodeWithDefaultAttributes(connectionToSplitId);
 
         network.addNode(newNode);
     }

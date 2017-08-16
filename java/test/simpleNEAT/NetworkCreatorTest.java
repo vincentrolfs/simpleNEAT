@@ -8,8 +8,6 @@ import simpleNEAT.NeuralNetwork.Node;
 import static org.junit.jupiter.api.Assertions.*;
 
 class NetworkCreatorTest {
-
-    // TODO: More tests
     
     private NetworkCreator _networkCreator;
 
@@ -34,83 +32,83 @@ class NetworkCreatorTest {
 
     @Test
     void newerConnectionGetsHigherInnovationNumber() {
-        Connection connection1 = _networkCreator.createNewConnection(2, 7);
-        Connection connection2 = _networkCreator.createNewConnection(2, 0);
+        Connection connection1 = _networkCreator.createConnectionWithRandomWeight(2, 7);
+        Connection connection2 = _networkCreator.createConnectionWithRandomWeight(2, 0);
 
         assertTrue(connection1.getInnovationNumber() < connection2.getInnovationNumber());
     }
 
     @Test
     void newerNodeGetsHigherInnovationNumber() {
-        Node node1 = _networkCreator.createNewNode(32);
-        Node node2 = _networkCreator.createNewNode(0);
+        Node node1 = _networkCreator.createNodeWithDefaultAttributes(32);
+        Node node2 = _networkCreator.createNodeWithDefaultAttributes(0);
 
         assertTrue(node1.getInnovationNumber() < node2.getInnovationNumber());
     }
 
     @Test
     void sameConnectionInnovationGetsSameInnovationNumber() {
-        Connection connection1 = _networkCreator.createNewConnection(2, 7);
-        _networkCreator.createNewConnection(2, 0);
-        _networkCreator.createNewNode(7325);
-        Connection connection3 = _networkCreator.createNewConnection(2, 7);
+        Connection connection1 = _networkCreator.createConnectionWithRandomWeight(2, 7);
+        _networkCreator.createConnectionWithRandomWeight(2, 0);
+        _networkCreator.createNodeWithDefaultAttributes(7325);
+        Connection connection3 = _networkCreator.createConnectionWithRandomWeight(2, 7);
 
         assertTrue(connection1.getInnovationNumber() == connection3.getInnovationNumber());
     }
 
     @Test
     void sameNodeInnovationGetsSameInnovationNumber() {
-        Node node1 = _networkCreator.createNewNode(237);
-        _networkCreator.createNewNode(3);
-        _networkCreator.createNewNode(2376);
-        _networkCreator.createNewConnection(2, 7);
-         _networkCreator.createNewConnection(2, 0);
-         _networkCreator.createNewConnection(2, 7);
-        Node node4 = _networkCreator.createNewNode(237);
+        Node node1 = _networkCreator.createNodeWithDefaultAttributes(237);
+        _networkCreator.createNodeWithDefaultAttributes(3);
+        _networkCreator.createNodeWithDefaultAttributes(2376);
+        _networkCreator.createConnectionWithRandomWeight(2, 7);
+         _networkCreator.createConnectionWithRandomWeight(2, 0);
+         _networkCreator.createConnectionWithRandomWeight(2, 7);
+        Node node4 = _networkCreator.createNodeWithDefaultAttributes(237);
 
         assertTrue(node1.getInnovationNumber() == node4.getInnovationNumber());
     }
 
     @Test
     void sameConnectionInnovationGetsSameInnovationNumberEvenInLaterGeneration() {
-        Connection connection1 = _networkCreator.createNewConnection(223, 722);
+        Connection connection1 = _networkCreator.createConnectionWithRandomWeight(223, 722);
         _networkCreator.nextGeneration();
-        Connection connection2 = _networkCreator.createNewConnection(282, 3);
+        Connection connection2 = _networkCreator.createConnectionWithRandomWeight(282, 3);
         _networkCreator.nextGeneration();
         _networkCreator.nextGeneration();
-        Connection connection3 = _networkCreator.createNewConnection(223, 722);
+        Connection connection3 = _networkCreator.createConnectionWithRandomWeight(223, 722);
 
         assertTrue(connection1.getInnovationNumber() == connection3.getInnovationNumber());
     }
 
     @Test
     void sameNodeInnovationGetsSameInnovationNumberEvenInLaterGeneration() {
-        Node node1 = _networkCreator.createNewNode(32);
-        _networkCreator.createNewNode(333);
+        Node node1 = _networkCreator.createNodeWithDefaultAttributes(32);
+        _networkCreator.createNodeWithDefaultAttributes(333);
 
         _networkCreator.nextGeneration();
 
-        _networkCreator.createNewNode(32);
-        _networkCreator.createNewConnection(44, 0);
-        _networkCreator.createNewConnection(0, 0);
+        _networkCreator.createNodeWithDefaultAttributes(32);
+        _networkCreator.createConnectionWithRandomWeight(44, 0);
+        _networkCreator.createConnectionWithRandomWeight(0, 0);
 
         _networkCreator.nextGeneration();
 
-        _networkCreator.createNewConnection(233, 7);
-        Node node4 = _networkCreator.createNewNode(32);
+        _networkCreator.createConnectionWithRandomWeight(233, 7);
+        Node node4 = _networkCreator.createNodeWithDefaultAttributes(32);
 
         assertTrue(node1.getInnovationNumber() == node4.getInnovationNumber());
     }
 
     @Test
     void networkCreatorForgetsAboutOldConnectionInnovations() {
-        Connection connection1 = _networkCreator.createNewConnection(2, 7);
+        Connection connection1 = _networkCreator.createConnectionWithRandomWeight(2, 7);
         _networkCreator.nextGeneration();
-        Connection connection2 = _networkCreator.createNewConnection(2, 0);
+        Connection connection2 = _networkCreator.createConnectionWithRandomWeight(2, 0);
         _networkCreator.nextGeneration();
         _networkCreator.nextGeneration();
         _networkCreator.nextGeneration();
-        Connection connection3 = _networkCreator.createNewConnection(2, 7);
+        Connection connection3 = _networkCreator.createConnectionWithRandomWeight(2, 7);
 
         assertTrue(connection1.getInnovationNumber() < connection2.getInnovationNumber());
         assertTrue(connection2.getInnovationNumber() < connection3.getInnovationNumber());
@@ -118,13 +116,13 @@ class NetworkCreatorTest {
 
     @Test
     void networkCreatorForgetsAboutOldNodeInnovations() {
-        Node node1 = _networkCreator.createNewNode(3244);
+        Node node1 = _networkCreator.createNodeWithDefaultAttributes(3244);
         _networkCreator.nextGeneration();
-        Node node2 = _networkCreator.createNewNode(32);
+        Node node2 = _networkCreator.createNodeWithDefaultAttributes(32);
         _networkCreator.nextGeneration();
         _networkCreator.nextGeneration();
         _networkCreator.nextGeneration();
-        Node node3 = _networkCreator.createNewNode(3244);
+        Node node3 = _networkCreator.createNodeWithDefaultAttributes(3244);
 
         assertTrue(node1.getInnovationNumber() < node2.getInnovationNumber());
         assertTrue(node2.getInnovationNumber() < node3.getInnovationNumber());
@@ -133,7 +131,7 @@ class NetworkCreatorTest {
     @Test
     void newConnectionHasCorrectProperties() {
         for (int i = 1; i <= 10000; i++) {
-            Connection connection = _networkCreator.createNewConnection(22, 12389);
+            Connection connection = _networkCreator.createConnectionWithRandomWeight(22, 12389);
             assertEquals(22, connection.getNodeOutOfId());
             assertEquals(12389, connection.getNodeIntoId());
             assertTrue(connection.getWeight() <= 3);
@@ -145,7 +143,7 @@ class NetworkCreatorTest {
     @Test
     void newNodeHasCorrectProperties() {
         for (int i = 1; i <= 10000; i++) {
-            Node node = _networkCreator.createNewNode(1273);
+            Node node = _networkCreator.createNodeWithDefaultAttributes(1273);
             assertEquals(0.5, node.getActivationSteepness());
             assertEquals(-4, node.getBias());
             assertFalse(node.isDisabled());
