@@ -17,23 +17,21 @@ public class ConnectionInnovation extends Innovation{
         _nodeIntoId = nodeIntoId;
     }
 
-    public int getNodeOutOfId() {
-        return _nodeOutOfId;
-    }
-
-    public int getNodeIntoId() {
-        return _nodeIntoId;
-    }
-
     @Override
-    public boolean equals(Object object) {
-        return (object instanceof ConnectionInnovation) &&
-                ((ConnectionInnovation) object)._nodeOutOfId == _nodeOutOfId &&
-                ((ConnectionInnovation) object)._nodeIntoId == _nodeIntoId;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ConnectionInnovation that = (ConnectionInnovation) o;
+
+        if (_nodeOutOfId != that._nodeOutOfId) return false;
+        return _nodeIntoId == that._nodeIntoId;
     }
 
     @Override
     public int hashCode() {
-        return 31 * _nodeOutOfId + _nodeIntoId;
+        int result = _nodeOutOfId;
+        result = 31 * result + _nodeIntoId;
+        return result;
     }
 }

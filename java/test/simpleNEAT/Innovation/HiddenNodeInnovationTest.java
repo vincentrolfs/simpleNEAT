@@ -4,11 +4,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class NodeInnovationTest {
+class HiddenNodeInnovationTest {
     @Test
     void sameConnectionSplitImpliesEquals() {
-        NodeInnovation inn1 = new NodeInnovation(2,1123);
-        NodeInnovation inn2 = new NodeInnovation(44,1123);
+        HiddenNodeInnovation inn1 = new HiddenNodeInnovation(2,1123);
+        HiddenNodeInnovation inn2 = new HiddenNodeInnovation(44,1123);
 
         assertTrue(inn1.equals(inn2));
         assertTrue(inn2.equals(inn1));
@@ -16,8 +16,8 @@ class NodeInnovationTest {
 
     @Test
     void differentConnectionSplitImpliesNotEquals() {
-        NodeInnovation inn1 = new NodeInnovation(66,1123);
-        NodeInnovation inn2 = new NodeInnovation(66,1124);
+        HiddenNodeInnovation inn1 = new HiddenNodeInnovation(66,1123);
+        HiddenNodeInnovation inn2 = new HiddenNodeInnovation(66,1124);
 
         assertFalse(inn1.equals(inn2));
         assertFalse(inn2.equals(inn1));
@@ -25,8 +25,8 @@ class NodeInnovationTest {
 
     @Test
     void sameConnectionSplitImpliesSameHashCode() {
-        NodeInnovation inn1 = new NodeInnovation(122,1123);
-        NodeInnovation inn2 = new NodeInnovation(0,1123);
+        HiddenNodeInnovation inn1 = new HiddenNodeInnovation(122,1123);
+        HiddenNodeInnovation inn2 = new HiddenNodeInnovation(0,1123);
 
         assertTrue(inn1.hashCode() == inn2.hashCode());
     }

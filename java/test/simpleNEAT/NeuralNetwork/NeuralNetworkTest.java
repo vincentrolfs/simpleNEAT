@@ -124,4 +124,28 @@ class NeuralNetworkTest {
         assertTrue(_network.hasConnectionBetween(12, 7));
         assertTrue(_network.hasConnectionBetween(1, 1));
     }
+
+    @Test
+    void insertionOfConnectionIntoConnectionlessNetworkWorks() {
+        Node node1 = new Node(0, 0.5, 0.9, false);
+        Node node2 = new Node(1, -3, -3.3, false);
+        Node node3 = new Node(2, -1, -2.7, false);
+        ArrayList<Node> nodes = new ArrayList<Node>() {{
+            add(node1);
+            add(node2);
+            add(node3);
+        }};
+        LinkedList<Connection> connections = new LinkedList<>();
+        NeuralNetwork network = new NeuralNetwork(nodes, connections, 1, 2);
+
+        Connection newConnection = new Connection(70, 0, 2, 0.5, true);
+
+        network.addConnection(newConnection);
+        List<Connection> allConnections = network.getConnectionsSorted();
+
+        assertEquals(1, allConnections.size());
+        assertEquals(newConnection, allConnections.get(0));
+        assertTrue(network.hasConnectionBetween(0, 2));
+
+    }
 }

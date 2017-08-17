@@ -3,12 +3,15 @@ package simpleNEAT;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import simpleNEAT.NeuralNetwork.Connection;
+import simpleNEAT.NeuralNetwork.NeuralNetwork;
 import simpleNEAT.NeuralNetwork.Node;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class NetworkCreatorTest {
-    
+
     private NetworkCreator _networkCreator;
 
     @BeforeEach
@@ -20,6 +23,23 @@ class NetworkCreatorTest {
                 0.2, 0.9, 0.5,
                 3
         );
+    }
+
+    @Test
+    void createsMinimalNeuralNetworkCorrectly() {
+        NeuralNetwork network = _networkCreator.createMinimalNeuralNetwork();
+        List<Node> nodes = network.getNodes();
+        List<Connection> connectionsSorted = network.getConnectionsSorted();
+
+        assertEquals(3, network.getAmountInputNodes());
+        assertEquals(4, network.getAmountOutputNodes());
+        assertEquals(0, connectionsSorted.size());
+        assertEquals(7, nodes.size());
+
+        for (Node someNode : nodes){
+            assertEquals(-4, someNode.getBias());
+            assertEquals(0.5, someNode.getActivationSteepness());
+        }
     }
 
     @Test
@@ -62,8 +82,8 @@ class NetworkCreatorTest {
         _networkCreator.createNodeWithDefaultAttributes(3);
         _networkCreator.createNodeWithDefaultAttributes(2376);
         _networkCreator.createConnectionWithRandomWeight(2, 7);
-         _networkCreator.createConnectionWithRandomWeight(2, 0);
-         _networkCreator.createConnectionWithRandomWeight(2, 7);
+        _networkCreator.createConnectionWithRandomWeight(2, 0);
+        _networkCreator.createConnectionWithRandomWeight(2, 7);
         Node node4 = _networkCreator.createNodeWithDefaultAttributes(237);
 
         assertTrue(node1.getInnovationNumber() == node4.getInnovationNumber());
@@ -149,4 +169,5 @@ class NetworkCreatorTest {
             assertFalse(node.isDisabled());
         }
     }
+
 }

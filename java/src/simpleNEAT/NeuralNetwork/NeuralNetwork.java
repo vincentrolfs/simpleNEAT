@@ -18,12 +18,12 @@ public class NeuralNetwork {
      * @param nodes Format: input nodes, then output nodes, then hidden nodes. Nodes must have distinct innovation numbers.
      *              Must contain at least two nodes.
      * @param connectionsSorted Must be sorted by innovationNumber. No two connections may both come out of the same
-     *                          node and go into the same node. Must contain at least two connections.
+     *                          node and go into the same node.
      * @param amountInputNodes Must be at least 1.
      * @param amountOutputNodes Must be at least 1.
      */
     public NeuralNetwork(ArrayList<Node> nodes, LinkedList<Connection> connectionsSorted, int amountInputNodes, int amountOutputNodes) {
-        assert nodes.size() >= 2 && connectionsSorted.size() >= 1 && amountInputNodes >= 1 && amountOutputNodes >= 1;
+        assert nodes.size() >= 2 && amountInputNodes >= 1 && amountOutputNodes >= 1;
 
         initializeNodes(nodes);
         initializeConnections(connectionsSorted);
@@ -40,6 +40,14 @@ public class NeuralNetwork {
 
     public LinkedList<Connection> getConnectionsSorted() {
         return _connectionsSorted;
+    }
+
+    public int getAmountInputNodes() {
+        return _amountInputNodes;
+    }
+
+    public int getAmountOutputNodes() {
+        return _amountOutputNodes;
     }
 
     /**

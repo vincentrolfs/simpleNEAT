@@ -1,18 +1,12 @@
 package simpleNEAT;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.Test;
-import simpleNEAT.Innovation.NodeInnovation;
 import simpleNEAT.NeuralNetwork.Connection;
 import simpleNEAT.NeuralNetwork.NeuralNetwork;
 import simpleNEAT.NeuralNetwork.Node;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class NetworkMutatorTest {
 
@@ -42,7 +36,7 @@ class NetworkMutatorTest {
 
         _network_1 = new NeuralNetwork(nodes, connectionsSorted, 1, 1);
 
-        //_networkCreator.registerInnovation(new NodeInnovation()); // TODO:  generation created not part of innovation
+        //_networkCreator.registerInnovation(new HiddenNodeInnovation()); // TODO:  generation created not part of innovation
     }
 /*
     @RepeatedTest(1)
