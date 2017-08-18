@@ -146,6 +146,5 @@ class NeuralNetworkTest {
         assertEquals(1, allConnections.size());
         assertEquals(newConnection, allConnections.get(0));
         assertTrue(network.hasConnectionBetween(0, 2));
-
     }
 }

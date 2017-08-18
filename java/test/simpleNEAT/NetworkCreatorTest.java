@@ -18,7 +18,7 @@ class NetworkCreatorTest {
     void setUp() {
         _networkCreator = new NetworkCreator(
                 3, 4,
-                -0.5, 3,
+                -0.5, 3, 1,
                 7, 8, -4,
                 0.2, 0.9, 0.5,
                 3
@@ -53,7 +53,7 @@ class NetworkCreatorTest {
     @Test
     void newerConnectionGetsHigherInnovationNumber() {
         Connection connection1 = _networkCreator.createConnectionWithRandomWeight(2, 7);
-        Connection connection2 = _networkCreator.createConnectionWithRandomWeight(2, 0);
+        Connection connection2 = _networkCreator.createConnectionWithDefaultWeight(2, 0);
 
         assertTrue(connection1.getInnovationNumber() < connection2.getInnovationNumber());
     }
@@ -68,8 +68,8 @@ class NetworkCreatorTest {
 
     @Test
     void sameConnectionInnovationGetsSameInnovationNumber() {
-        Connection connection1 = _networkCreator.createConnectionWithRandomWeight(2, 7);
-        _networkCreator.createConnectionWithRandomWeight(2, 0);
+        Connection connection1 = _networkCreator.createConnectionWithGivenWeight(2, 7, 1.6);
+        _networkCreator.createConnectionWithDefaultWeight(2, 0);
         _networkCreator.createNodeWithDefaultAttributes(7325);
         Connection connection3 = _networkCreator.createConnectionWithRandomWeight(2, 7);
 
@@ -82,7 +82,7 @@ class NetworkCreatorTest {
         _networkCreator.createNodeWithDefaultAttributes(3);
         _networkCreator.createNodeWithDefaultAttributes(2376);
         _networkCreator.createConnectionWithRandomWeight(2, 7);
-        _networkCreator.createConnectionWithRandomWeight(2, 0);
+        _networkCreator.createConnectionWithGivenWeight(2, 0, -0.2);
         _networkCreator.createConnectionWithRandomWeight(2, 7);
         Node node4 = _networkCreator.createNodeWithDefaultAttributes(237);
 
@@ -109,8 +109,8 @@ class NetworkCreatorTest {
         _networkCreator.nextGeneration();
 
         _networkCreator.createNodeWithDefaultAttributes(32);
-        _networkCreator.createConnectionWithRandomWeight(44, 0);
-        _networkCreator.createConnectionWithRandomWeight(0, 0);
+        _networkCreator.createConnectionWithGivenWeight(44, 0, -0.5);
+        _networkCreator.createConnectionWithDefaultWeight(0, 0);
 
         _networkCreator.nextGeneration();
 
@@ -149,7 +149,7 @@ class NetworkCreatorTest {
     }
 
     @Test
-    void newConnectionHasCorrectProperties() {
+    void randomNewConnectionHasCorrectAttributes() {
         for (int i = 1; i <= 10000; i++) {
             Connection connection = _networkCreator.createConnectionWithRandomWeight(22, 12389);
             assertEquals(22, connection.getNodeOutOfId());
@@ -161,7 +161,7 @@ class NetworkCreatorTest {
     }
 
     @Test
-    void newNodeHasCorrectProperties() {
+    void newNodeWithDefaultAttributesHasCorrectAttributes() {
         for (int i = 1; i <= 10000; i++) {
             Node node = _networkCreator.createNodeWithDefaultAttributes(1273);
             assertEquals(0.5, node.getActivationSteepness());

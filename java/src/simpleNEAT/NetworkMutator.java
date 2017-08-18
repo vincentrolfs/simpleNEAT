@@ -37,9 +37,9 @@ public class NetworkMutator {
 
     /**
      * Introduces mutation into network by random chance. It is possible that no mutation occurs.
-     * @param network Must contain at least two nodes and one connection.
+     * @param network Must contain at least one input and one output node.
      */
-    public void maybeMutate(NeuralNetwork network) {
+    public void mutate(NeuralNetwork network) {
         if (RandomUtil.getRandomBoolean(_weightMutationProbability)) {
             performWeightMutation(network);
         }
@@ -87,12 +87,32 @@ public class NetworkMutator {
         network.addConnection(newConnection);
     }
 
-
     private void performAddNodeMutation(NeuralNetwork network) {
-        Connection connectionToSplit = RandomUtil.sampleFrom(network.getConnectionsSorted());
-        int connectionToSplitId = connectionToSplit.getInnovationNumber();
-        Node newNode = _networkCreator.createNodeWithDefaultAttributes(connectionToSplitId);
+        List<Connection> allConnections = network.getConnectionsSorted();
 
+        if (allConnections.size() == 0){
+            return;
+        }
+
+        Connection connectionToSplit = RandomUtil.sampleFrom(allConnections);
+        int connectionToSplitId = connectionToSplit.getInnovationNumber();
+
+        Node newNode = _networkCreator.createNodeWithDefaultAttributes(connectionToSplitId);
+        int newNodeId = newNode.getInnovationNumber();
+
+        Connection newConnectionIn = _networkCreator.createConnectionWithDefaultWeight(
+                connectionToSplit.getNodeOutOfId(),
+                newNodeId
+        );
+        Connection newConnectionOut = _networkCreator.createConnectionWithGivenWeight(
+                newNodeId,
+                connectionToSplit.getNodeIntoId(),
+                connectionToSplit.getWeight()
+        );
+
+        connectionToSplit.setDisabled(true);
         network.addNode(newNode);
+        network.addConnection(newConnectionIn);
+        network.addConnection(newConnectionOut);
     }
 }

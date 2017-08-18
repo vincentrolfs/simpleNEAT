@@ -51,4 +51,8 @@ public class Connection {
     public boolean isDisabled() {
         return _disabled;
     }
+
+    public void setDisabled(boolean disabled) {
+        _disabled = disabled;
+    }
 }
