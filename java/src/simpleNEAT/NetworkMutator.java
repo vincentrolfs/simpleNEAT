@@ -5,28 +5,28 @@ import java.util.*;
 
 public class NetworkMutator {
 
-    private NetworkCreator _networkCreator;
+    private final NetworkCreator _networkCreator;
 
-    private double _connectionDisabledMutationProbability;
-    private double _connectionWeightMutationProbability;
-    private double _nodeParameterMutationProbability;
-    private double _addNodeMutationProbability;
-    private double _addConnectionMutationProbability;
+    private final double _connectionDisabledMutationProbability;
+    private final double _connectionWeightMutationProbability;
+    private final double _nodeParameterMutationProbability;
+    private final double _addNodeMutationProbability;
+    private final double _addConnectionMutationProbability;
 
-    private double _connectionDisabledMutation_connectionAffectedProbability;
+    private final double _connectionDisabledMutation_connectionAffectedProbability;
 
-    private double _connectionWeightMutation_connectionAffectedProbability;
-    private double _connectionWeightMutation_newRandomWeightProbability;
-    private double _connectionWeightMutation_maxWeightPerturbanceMagnitude;
+    private final double _connectionWeightMutation_connectionAffectedProbability;
+    private final double _connectionWeightMutation_newRandomWeightProbability;
+    private final double _connectionWeightMutation_maxWeightPerturbanceMagnitude;
 
-    private double _nodeParameterMutation_nodeAffectedProbability;
-    private double _nodeParameterMutation_newRandomBiasProbability;
-    private double _nodeParameterMutation_newRandomActivationSteepnessProbability;
-    private double _nodeParameterMutation_maxBiasPerturbanceMagnitude;
-    private double _nodeParameterMutation_maxActivationSteepnessPerturbanceMagnitude;
+    private final double _nodeParameterMutation_nodeAffectedProbability;
+    private final double _nodeParameterMutation_newRandomBiasProbability;
+    private final double _nodeParameterMutation_newRandomActivationSteepnessProbability;
+    private final double _nodeParameterMutation_maxBiasPerturbanceMagnitude;
+    private final double _nodeParameterMutation_maxActivationSteepnessPerturbanceMagnitude;
 
-    private int _addConnectionMutation_maxTriesForConnectionSelection;
-    private boolean _addConnectionMutation_fallBackToConnectionWeightMutationOnFail;
+    private final int _addConnectionMutation_maxTriesForConnectionSelection;
+    private final boolean _addConnectionMutation_fallBackToConnectionWeightMutationOnFail;
 
     /**
      * Class for mutating neural networks. Below is a list of possible mutations. All of them have a certain probability
@@ -34,23 +34,11 @@ public class NetworkMutator {
      * Note: A perturbation means adding a small quantity to an existing value, the maximum absolute value of that
      * quantity is here specified by the _mutationName_max*PerturbanceMagnitude parameters.
      *
-     * Possible mutations:
-     * connectionDisabledMutation: Each connection in the network, if it is affected, has its "disabled" state toggled.
-     *
-     * connectionWeightMutation: Each connection in the network, should it be affected, has its weight either pertubed
-     * or gets a completely new random weight.
-     *
-     * nodeParameterMutation: Each node in the network, should it be affected, has its bias either pertubed
-     * or gets a completely new random bias, same for the activation steepness.
-     *
-     * addNodeMutation: Finds a random connection in the network (if one exists), and splits it by effectively putting
-     * a node in the middle of the connection. That means that two new connections are created, and the original
-     * connection chosen is disabled.
-     *
-     * addConnectionMutation: Finds two random unconnected nodes and adds a new connection between them with a random
-     * weight. It tries {@code _addConnectionMutation_maxTriesForConnectionSelection}-times to find a place for the new
-     * connection. If that fails and if {@code addConnectionMutation_fallBackToConnectionWeightMutationOnFail} is true,
-     * a connectionweightMutation is performed.
+     * @param connectionDisabledMutationProbability Mutation effect: Each connection in the network, if it is affected, has its "disabled" state toggled.
+     * @param connectionWeightMutationProbability Mutation effect: Each connection in the network, should it be affected, has its weight either pertubed or gets a completely new random weight (probabilities of these outcomes are set via the other parameters).
+     * @param nodeParameterMutationProbability Mutation effect: Each node in the network, should it be affected, has its bias either pertubed or gets a completely new random bias, same for the activation steepness.
+     * @param addNodeMutationProbability Mutation effect: Finds a random connection in the network (if one exists), and splits it by effectively putting a node in the middle of the connection. That means that two new connections are created, and the original connection chosen is disabled.
+     * @param addConnectionMutationProbability Mutation effect: Finds two random unconnected nodes and adds a new connection between them with a random weight. It tries {@code _addConnectionMutation_maxTriesForConnectionSelection}-times to find a place for the new connection. If that fails and if {@code addConnectionMutation_fallBackToConnectionWeightMutationOnFail} is true, a connectionweightMutation is performed.
      */
     public NetworkMutator(NetworkCreator networkCreator, double connectionDisabledMutationProbability, double connectionWeightMutationProbability, double nodeParameterMutationProbability, double addNodeMutationProbability, double addConnectionMutationProbability, double connectionDisabledMutation_connectionAffectedProbability, double connectionWeightMutation_connectionAffectedProbability, double connectionWeightMutation_newRandomWeightProbability, double connectionWeightMutation_maxWeightPerturbanceMagnitude, double nodeParameterMutation_nodeAffectedProbability, double nodeParameterMutation_newRandomBiasProbability, double nodeParameterMutation_newRandomActivationSteepnessProbability, double nodeParameterMutation_maxBiasPerturbanceMagnitude, double nodeParameterMutation_maxActivationSteepnessPerturbanceMagnitude, int addConnectionMutation_maxTriesForConnectionSelection, boolean addConnectionMutation_fallBackToConnectionWeightMutationOnFail) {
         _networkCreator = networkCreator;
@@ -127,7 +115,9 @@ public class NetworkMutator {
         List<Node> allNodes = network.getNodes();
 
         for (Node someNode : allNodes){
-            performNodeParameterMutation_onSpecificNode(someNode);
+            if (RandomUtil.getRandomBoolean(_nodeParameterMutation_nodeAffectedProbability)) {
+                performNodeParameterMutation_onSpecificNode(someNode);
+            }
         }
     }
 
