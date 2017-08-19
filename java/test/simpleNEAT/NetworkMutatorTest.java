@@ -24,15 +24,13 @@ class NetworkMutatorTest {
     private NetworkMutator _mutatorForForcedAddConnectionMutation;
     private NetworkMutator _mutatorForForcedAddNodeMutation;
 
-    // TODO: More nodes creation tests.
-
     @BeforeEach
     void setUp() {
         _networkCreator = new NetworkCreator(
             1, 1,
             -9, 2, 1,
-            -1, 2, 0,
-            0.3, 1.3, 1,
+            -1, 2, 0.8,
+            0.3, 1.3, 1.88,
             1
         );
 
@@ -81,6 +79,82 @@ class NetworkMutatorTest {
         List<Node> nodes = _network_1.getNodes();
 
         assertEquals(3, nodes.size());
+    }
+
+    @Test
+    void forcedAddNodeMutationInsertsNewNodeCorrectly(){
+        _mutatorForForcedAddNodeMutation.mutate(_network_1);
+        List<Node> nodes = _network_1.getNodes();
+
+        assertEquals(_inputNode_1, nodes.get(0));
+        assertEquals(_outputNode_1, nodes.get(1));
+        assertNotEquals(_inputNode_1, nodes.get(2));
+        assertNotEquals(_outputNode_1, nodes.get(2));
+    }
+
+    @Test
+    void forcedAddNodeMutationResultsInThreeConnections(){
+        _mutatorForForcedAddNodeMutation.mutate(_network_1);
+        List<Connection> connections = _network_1.getConnectionsSorted();
+
+        assertEquals(3, connections.size());
+    }
+
+    @Test
+    void forcedAddNodeMutationDisablesOldConnection(){
+        _mutatorForForcedAddNodeMutation.mutate(_network_1);
+        assertTrue(_initialConnection_1.isDisabled());
+    }
+
+    @Test
+    void forcedAddNodeMutationInsertsNewConnectionsCorrectly(){
+        _mutatorForForcedAddNodeMutation.mutate(_network_1);
+        List<Node> nodes= _network_1.getNodes();
+        List<Connection> connectionsSorted = _network_1.getConnectionsSorted();
+        Node newNode = nodes.get(2);
+        Connection newConnectionIn = connectionsSorted.get(1);
+        Connection newConnectionOut = connectionsSorted.get(2);
+
+        assertEquals(_initialConnection_1, connectionsSorted.get(0));
+
+        assertEquals(_inputNode_1.getInnovationNumber(), newConnectionIn.getNodeOutOfId());
+        assertEquals(newNode.getInnovationNumber(), newConnectionIn.getNodeIntoId());
+
+        assertEquals(newNode.getInnovationNumber(), newConnectionOut.getNodeOutOfId());
+        assertEquals(_outputNode_1.getInnovationNumber(), newConnectionOut.getNodeIntoId());
+    }
+
+    @Test
+    void forcedAddNodeMutationCreatesNewConnectionsWithCorrectWeights(){
+        _mutatorForForcedAddNodeMutation.mutate(_network_1);
+        List<Connection> connectionsSorted = _network_1.getConnectionsSorted();
+        Connection newConnectionIn = connectionsSorted.get(1);
+        Connection newConnectionOut = connectionsSorted.get(2);
+
+        assertEquals(1, newConnectionIn.getWeight());
+        assertEquals(1.2, newConnectionOut.getWeight());
+    }
+
+    @Test
+    void forcedAddNodeMutationCreatesNewConnectionsNonDisabled(){
+        _mutatorForForcedAddNodeMutation.mutate(_network_1);
+        List<Connection> connectionsSorted = _network_1.getConnectionsSorted();
+        Connection newConnectionIn = connectionsSorted.get(1);
+        Connection newConnectionOut = connectionsSorted.get(2);
+
+        assertFalse(newConnectionIn.isDisabled());
+        assertFalse(newConnectionOut.isDisabled());
+    }
+
+    @Test
+    void forcedAddNodeMutationCreatesNewNodeWithCorrectAttributes() {
+        _mutatorForForcedAddNodeMutation.mutate(_network_1);
+        List<Node> nodes = _network_1.getNodes();
+        Node newNode = nodes.get(2);
+
+        assertEquals(1.88, newNode.getActivationSteepness());
+        assertEquals(0.8, newNode.getBias());
+        assertFalse(newNode.isDisabled());
     }
 
     @Test
@@ -137,7 +211,7 @@ class NetworkMutatorTest {
         assertEquals(15000, output_input_chosen, 300);
     }
 
-    @RepeatedTest(100)
+    @RepeatedTest(10)
     void forcedAddConnectionMutationIsHasCorrectWeights() {
         _mutatorForForcedAddConnectionMutation.mutate(_network_1);
         List<Connection> connections = _network_1.getConnectionsSorted();

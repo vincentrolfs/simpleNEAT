@@ -7,7 +7,7 @@ public class NetworkMutator {
 
     NetworkCreator _networkCreator;
 
-    double _weightMutationProbability;
+    double _connectionParameterMutationProbability;
     double _nodeParameterMutationProbability;
     double _addNodeMutationProbability;
     double _addConnectionMutationProbability;
@@ -19,10 +19,10 @@ public class NetworkMutator {
     double _nodeBiasPerturbanceMagnitude;
     double _nodeActivationSteepnessPerturbanceMagnitude;
 
-    public NetworkMutator(NetworkCreator networkCreator, double weightMutationProbability, double nodeParameterMutationProbability, double addNodeMutationProbability, double addConnectionMutationProbability, int connectionMutationMaxTries, boolean fallBackToWeightMutationOnConnectionMutationFail, double connectionWeightPerturbanceMagnitude, double nodeBiasPerturbanceMagnitude, double nodeActivationSteepnessPerturbanceMagnitude) {
+    public NetworkMutator(NetworkCreator networkCreator, double connectionParameterMutationProbability, double nodeParameterMutationProbability, double addNodeMutationProbability, double addConnectionMutationProbability, int connectionMutationMaxTries, boolean fallBackToWeightMutationOnConnectionMutationFail, double connectionWeightPerturbanceMagnitude, double nodeBiasPerturbanceMagnitude, double nodeActivationSteepnessPerturbanceMagnitude) {
         _networkCreator = networkCreator;
 
-        _weightMutationProbability = weightMutationProbability;
+        _connectionParameterMutationProbability = connectionParameterMutationProbability;
         _nodeParameterMutationProbability = nodeParameterMutationProbability;
         _addNodeMutationProbability = addNodeMutationProbability;
         _addConnectionMutationProbability = addConnectionMutationProbability;
@@ -40,8 +40,8 @@ public class NetworkMutator {
      * @param network Must contain at least one input and one output node.
      */
     public void mutate(NeuralNetwork network) {
-        if (RandomUtil.getRandomBoolean(_weightMutationProbability)) {
-            performWeightMutation(network);
+        if (RandomUtil.getRandomBoolean(_connectionParameterMutationProbability)) {
+            performConnectionParameterMutation(network);
         }
         if (RandomUtil.getRandomBoolean(_nodeParameterMutationProbability)) {
             performNodeParameterMutation(network);
@@ -54,7 +54,7 @@ public class NetworkMutator {
         }
     }
 
-    private void performWeightMutation(NeuralNetwork network) {
+    private void performConnectionParameterMutation(NeuralNetwork network) {
     }
 
     private void performNodeParameterMutation(NeuralNetwork network) {
@@ -78,7 +78,7 @@ public class NetworkMutator {
         if (newConnectionIdentified){
             addConnection(network, nodeOutOfId, nodeIntoId);
         } else if (_fallBackToWeightMutationOnConnectionMutationFail){
-            performWeightMutation(network);
+            performConnectionParameterMutation(network);
         }
     }
 

@@ -78,7 +78,10 @@ public class NeuralNetwork {
         while (iterator.hasPrevious()) {
             Connection connection = iterator.previous();
 
-            if (connection.getInnovationNumber() < newConnection.getInnovationNumber()) {
+            if (connection.getInnovationNumber() <= newConnection.getInnovationNumber()) {
+                assert connection.getInnovationNumber() != newConnection.getInnovationNumber()
+                        : "Innovation number of new connection already present in network";
+
                 iterator.next();
                 iterator.add(newConnection);
                 iterator.previous();
