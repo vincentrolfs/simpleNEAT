@@ -93,6 +93,27 @@ public class NetworkCreator {
     }
 
     /**
+     * Caps connectionWeight so that it is between connectionWeightMin and connectionWeightMax
+     */
+    double capConnectionWeight(double connectionWeight){
+        return capDouble(connectionWeight, _connectionWeightMin, _connectionWeightMax);
+    }
+
+    /**
+     * Caps nodeBias so that it is between nodeBiasMin and nodeBiasMax
+     */
+    double capNodeBias(double nodeBias){
+        return capDouble(nodeBias, _nodeBiasMin, _nodeBiasMax);
+    }
+
+    /**
+     * Caps capNodeActivationSteepness so that it is between nodeActivationSteepnessMin and nodeActivationSteepnessMax
+     */
+    double capNodeActivationSteepness(double nodeActivationSteepness){
+        return capDouble(nodeActivationSteepness, _nodeActivationSteepnessMin, _nodeActivationSteepnessMax);
+    }
+
+    /**
      * Creates a non-disabled connection with the given weight and the correct innovation number.
      * @param nodeOutOfId Must be non-negative.
      * @param nodeIntoId  Must be non-negative.
@@ -156,6 +177,14 @@ public class NetworkCreator {
         return RandomUtil.getRandomDouble(_connectionWeightMin, _connectionWeightMax);
     }
 
+    double getRandomNodeBias() {
+        return RandomUtil.getRandomDouble(_nodeBiasMin, _nodeBiasMax);
+    }
+
+    double getRandomNodeActivationSteepness() {
+        return RandomUtil.getRandomDouble(_nodeActivationSteepnessMin, _nodeActivationSteepnessMax);
+    }
+
     private int determineInnovationNumber(Innovation innovation) {
         Integer innovationNumber = _innovationNumbers.get(innovation);
 
@@ -199,5 +228,15 @@ public class NetworkCreator {
         Node newNode = new Node(innovationNumber, _defaultNodeActivationSteepness, _defaultNodeBias);
 
         return newNode;
+    }
+
+    private double capDouble(double value, double min, double max){
+        if (value < min){
+            return min;
+        } else if (value > max){
+            return  max;
+        } else {
+            return value;
+        }
     }
 }

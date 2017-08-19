@@ -43,14 +43,6 @@ class NetworkCreatorTest {
     }
 
     @Test
-    void randomConnectionWeightsAreInRange() {
-        for (int i = 0; i < 10000; i++) {
-            double weight = _networkCreator.getRandomConnectionWeight();
-            assertTrue(-0.5 <= weight && weight <= 3);
-        }
-    }
-
-    @Test
     void newerConnectionGetsHigherInnovationNumber() {
         Connection connection1 = _networkCreator.createConnectionWithRandomWeight(2, 7);
         Connection connection2 = _networkCreator.createConnectionWithDefaultWeight(2, 0);
@@ -169,4 +161,73 @@ class NetworkCreatorTest {
         }
     }
 
+    @Test
+    void capsConnectionWeightsCorrectly() {
+        assertEquals(-0.5, _networkCreator.capConnectionWeight(-0.5));
+        assertEquals(3, _networkCreator.capConnectionWeight(3));
+
+        assertEquals(-0.4, _networkCreator.capConnectionWeight(-0.4));
+        assertEquals(2.99, _networkCreator.capConnectionWeight(2.99));
+        assertEquals(0, _networkCreator.capConnectionWeight(0));
+        assertEquals(1, _networkCreator.capConnectionWeight(1));
+
+        assertEquals(-0.5, _networkCreator.capConnectionWeight(-0.6));
+        assertEquals(-0.5, _networkCreator.capConnectionWeight(-1));
+        assertEquals(3, _networkCreator.capConnectionWeight(3.001));
+        assertEquals(3, _networkCreator.capConnectionWeight(763487613));
+    }
+
+    @Test
+    void capsNodeBiasCorrectly() {
+        assertEquals(7, _networkCreator.capNodeBias(7));
+        assertEquals(8, _networkCreator.capNodeBias(8));
+
+        assertEquals(7.1, _networkCreator.capNodeBias(7.1));
+        assertEquals(7.9, _networkCreator.capNodeBias(7.9));
+        assertEquals(7.5, _networkCreator.capNodeBias(7.5));
+
+        assertEquals(7, _networkCreator.capNodeBias(6.9));
+        assertEquals(7, _networkCreator.capNodeBias(-1));
+        assertEquals(8, _networkCreator.capNodeBias(8.001));
+        assertEquals(8, _networkCreator.capNodeBias(222222));
+    }
+
+    @Test
+    void capsNodeActivationSteepnessCorrectly() {
+        assertEquals(0.2, _networkCreator.capNodeActivationSteepness(0.2));
+        assertEquals(0.9, _networkCreator.capNodeActivationSteepness(0.9));
+
+        assertEquals(0.201, _networkCreator.capNodeActivationSteepness(0.201));
+        assertEquals(0.8999, _networkCreator.capNodeActivationSteepness(0.8999));
+        assertEquals(0.4, _networkCreator.capNodeActivationSteepness(0.4));
+
+        assertEquals(0.2, _networkCreator.capNodeActivationSteepness(0.1999));
+        assertEquals(0.2, _networkCreator.capNodeActivationSteepness(-786213));
+        assertEquals(0.9, _networkCreator.capNodeActivationSteepness(0.999));
+        assertEquals(0.9, _networkCreator.capNodeActivationSteepness(1.872938));
+    }
+
+    @Test
+    void randomConnectionWeightsAreInRange() {
+        for (int i = 0; i < 10000; i++) {
+            double weight = _networkCreator.getRandomConnectionWeight();
+            assertTrue(-0.5 <= weight && weight <= 3);
+        }
+    }
+
+    @Test
+    void randomNodeBiasesAreInRange() {
+        for (int i = 0; i < 10000; i++) {
+            double bias = _networkCreator.getRandomNodeBias();
+            assertTrue(7 <= bias && bias <= 8);
+        }
+    }
+
+    @Test
+    void randomNodeActivationSteepnessesAreInRange() {
+        for (int i = 0; i < 10000; i++) {
+            double activationSteepness = _networkCreator.getRandomNodeActivationSteepness();
+            assertTrue(0.2 <= activationSteepness && activationSteepness <= 0.9);
+        }
+    }
 }

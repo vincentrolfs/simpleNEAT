@@ -46,15 +46,45 @@ class NetworkMutatorTest {
         _initialConnection_1.setWeight(1.2);
         _network_1.addConnection(_initialConnection_1);
 
-        _mutatorForForcedAddConnectionMutation = new NetworkMutator(_networkCreator,
-                0, 0, 0, 1,
-                1000, false,
-                0, 0, 0);
+        _mutatorForForcedAddConnectionMutation = new NetworkMutator(
+            _networkCreator,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1000,
+            false
+        );
 
-        _mutatorForForcedAddNodeMutation = new NetworkMutator(_networkCreator,
-                0, 0, 1, 0,
-                1000, false,
-                0, 0, 0);
+        _mutatorForForcedAddNodeMutation = new NetworkMutator(
+                _networkCreator,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                1,
+                1,
+                1000,
+                false
+        );
     }
 
     @Test

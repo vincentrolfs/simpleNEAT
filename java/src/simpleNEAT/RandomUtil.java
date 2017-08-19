@@ -15,7 +15,7 @@ class RandomUtil {
     }
 
     /**
-     * Generates random boolean with given probability.
+     * Generates random boolean. Generates "true" with the given probability.
      * @param probability Must be between 0 and 1 inclusive.
      */
     static boolean getRandomBoolean(double probability){
