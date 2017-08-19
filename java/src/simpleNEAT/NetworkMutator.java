@@ -5,19 +5,19 @@ import java.util.*;
 
 public class NetworkMutator {
 
-    NetworkCreator _networkCreator;
+    private NetworkCreator _networkCreator;
 
-    double _connectionParameterMutationProbability;
-    double _nodeParameterMutationProbability;
-    double _addNodeMutationProbability;
-    double _addConnectionMutationProbability;
+    private double _connectionParameterMutationProbability;
+    private double _nodeParameterMutationProbability;
+    private double _addNodeMutationProbability;
+    private double _addConnectionMutationProbability;
 
-    int _connectionMutationMaxTries;
-    boolean _fallBackToWeightMutationOnConnectionMutationFail;
+    private int _connectionMutationMaxTries;
+    private boolean _fallBackToWeightMutationOnConnectionMutationFail;
 
-    double _connectionWeightPerturbanceMagnitude;
-    double _nodeBiasPerturbanceMagnitude;
-    double _nodeActivationSteepnessPerturbanceMagnitude;
+    private double _connectionWeightPerturbanceMagnitude;
+    private double _nodeBiasPerturbanceMagnitude;
+    private double _nodeActivationSteepnessPerturbanceMagnitude;
 
     public NetworkMutator(NetworkCreator networkCreator, double connectionParameterMutationProbability, double nodeParameterMutationProbability, double addNodeMutationProbability, double addConnectionMutationProbability, int connectionMutationMaxTries, boolean fallBackToWeightMutationOnConnectionMutationFail, double connectionWeightPerturbanceMagnitude, double nodeBiasPerturbanceMagnitude, double nodeActivationSteepnessPerturbanceMagnitude) {
         _networkCreator = networkCreator;
@@ -39,7 +39,7 @@ public class NetworkMutator {
      * Introduces mutation into network by random chance. It is possible that no mutation occurs.
      * @param network Must contain at least one input and one output node.
      */
-    public void mutate(NeuralNetwork network) {
+    void mutate(NeuralNetwork network) {
         if (RandomUtil.getRandomBoolean(_connectionParameterMutationProbability)) {
             performConnectionParameterMutation(network);
         }
@@ -55,6 +55,8 @@ public class NetworkMutator {
     }
 
     private void performConnectionParameterMutation(NeuralNetwork network) {
+        List<Connection> allConnections = network.getConnectionsSorted();
+
     }
 
     private void performNodeParameterMutation(NeuralNetwork network) {

@@ -166,7 +166,6 @@ class NetworkCreatorTest {
             Node node = _networkCreator.createNodeWithDefaultAttributes(1273);
             assertEquals(0.5, node.getActivationSteepness());
             assertEquals(-4, node.getBias());
-            assertFalse(node.isDisabled());
         }
     }
 

@@ -19,9 +19,9 @@ class NeuralNetworkTest {
 
     @BeforeEach
     void setUp() {
-        _node1 = new Node(12, -4, -9, false);
-        _node2 = new Node(1, 2, 4, true);
-        _node3 = new Node(7, -4, 1, false);
+        _node1 = new Node(12, -4, -9);
+        _node2 = new Node(1, 2, 4);
+        _node3 = new Node(7, -4, 1);
         _connection1_2 = new Connection(5, 12, 1, 0.6, false);
         _connection2_3 = new Connection(127684, 1, 7, 80, false);
 
@@ -73,7 +73,7 @@ class NeuralNetworkTest {
 
     @Test
     void addsNodesAtTheEnd() {
-        Node node4 = new Node(9, 23.1, 4, true);
+        Node node4 = new Node(9, 23.1, 4);
         _network.addNode(node4);
 
         List<Node> expected = new ArrayList<Node> (){{
@@ -88,7 +88,7 @@ class NeuralNetworkTest {
 
     @Test
     void registersNodeId() {
-        Node node4 = new Node(9, 23.1, 4, true);
+        Node node4 = new Node(9, 23.1, 4);
         _network.addNode(node4);
         assertTrue(_network.isNodeIdInNetwork(9));
     }
@@ -127,9 +127,9 @@ class NeuralNetworkTest {
 
     @Test
     void insertionOfConnectionIntoConnectionlessNetworkWorks() {
-        Node node1 = new Node(0, 0.5, 0.9, false);
-        Node node2 = new Node(1, -3, -3.3, false);
-        Node node3 = new Node(2, -1, -2.7, false);
+        Node node1 = new Node(0, 0.5, 0.9);
+        Node node2 = new Node(1, -3, -3.3);
+        Node node3 = new Node(2, -1, -2.7);
         ArrayList<Node> nodes = new ArrayList<Node>() {{
             add(node1);
             add(node2);

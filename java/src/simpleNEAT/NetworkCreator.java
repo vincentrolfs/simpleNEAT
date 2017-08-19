@@ -196,7 +196,7 @@ public class NetworkCreator {
 
     private Node createNodeWithDefaultAttributesFromInnovation(Innovation innovation){
         int innovationNumber = determineInnovationNumber(innovation);
-        Node newNode = new Node(innovationNumber, _defaultNodeActivationSteepness, _defaultNodeBias, false);
+        Node newNode = new Node(innovationNumber, _defaultNodeActivationSteepness, _defaultNodeBias);
 
         return newNode;
     }

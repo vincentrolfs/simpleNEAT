@@ -18,7 +18,8 @@ public class NeuralNetwork {
      * @param nodes Format: input nodes, then output nodes, then hidden nodes. Nodes must have distinct innovation numbers.
      *              Must contain at least two nodes.
      * @param connectionsSorted Must be sorted by innovationNumber. No two connections may both come out of the same
-     *                          node and go into the same node.
+     *                          node and go into the same node. (This implies that no two connection may have the same
+     *                          innovation numbers).
      * @param amountInputNodes Must be at least 1.
      * @param amountOutputNodes Must be at least 1.
      */
@@ -65,7 +66,8 @@ public class NeuralNetwork {
      * Adds newConnection to the connections of this network at the appropriate position.
      * Ensures {@code hasConnectionBetween(newConnection.getNodeOutOfId(), newConnection.getNodeIntoId())}.
      * @param newConnection There must not exist a connection in the network that comes out of the same node
-     *                      and goes into the same node as newConnection.
+     *                      and goes into the same node as newConnection. (This implies that no connection with the same
+     *                      innovation number as newConnection may exist in the network).
      *                      Must fit the topology of the network, i.e. newConnection.getNodeOutOfId() and
      *                      newConnection.getNodeIntoId() must be innovation numbers of nodes present in the network.
      */

@@ -8,18 +8,16 @@ public class Node {
     private int _innovationNumber;
     private double _activationSteepness;
     private double _bias;
-    private boolean _disabled;
 
     /**
      * @param innovationNumber Must be non-negative.
      */
-    public Node(int innovationNumber, double activationSteepness, double bias, boolean disabled) {
+    public Node(int innovationNumber, double activationSteepness, double bias) {
         assert innovationNumber >= 0;
 
         _innovationNumber = innovationNumber;
         _activationSteepness = activationSteepness;
         _bias = bias;
-        _disabled = disabled;
     }
 
     public int getInnovationNumber() {
@@ -40,9 +38,5 @@ public class Node {
 
     public void setBias(double bias) {
         _bias = bias;
-    }
-
-    public boolean isDisabled() {
-        return _disabled;
     }
 }

@@ -154,7 +154,6 @@ class NetworkMutatorTest {
 
         assertEquals(1.88, newNode.getActivationSteepness());
         assertEquals(0.8, newNode.getBias());
-        assertFalse(newNode.isDisabled());
     }
 
     @Test
