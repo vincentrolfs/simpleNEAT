@@ -1,6 +1,5 @@
 package simpleNEAT;
 
-import org.jcp.xml.dsig.internal.MacOutputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
@@ -38,7 +37,7 @@ class NetworkMutatorTest {
             1, 1,
             -9, 2, 1,
             -1, 2, 0.8,
-            0.3, 1.3, 1.88,
+            0.3, 2, 1.88,
             1
         );
 
@@ -85,41 +84,41 @@ class NetworkMutatorTest {
     private void initializeMutators() {
         _mutatorForForcedAddConnectionMutation = new NetworkMutator(
                 _networkCreator,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
+                0.8,
+                0.99,
+                0.9,
                 0,
                 1,
                 1,
+                1,
+                0.7,
+                4.4,
+                1,
+                0.5,
+                0.9,
+                3,
+                3,
                 1000,
                 false
         );
 
         _mutatorForForcedAddNodeMutation = new NetworkMutator(
                 _networkCreator,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
+                0.5,
                 0,
                 0,
                 1,
                 0,
-                0,
-                0,
                 1,
                 1,
-                1000,
+                0.5,
+                4,
+                1,
+                0.5,
+                0.6,
+                3,
+                4,
+                10,
                 false
         );
     }
@@ -172,10 +171,10 @@ class NetworkMutatorTest {
         NetworkMutator mutator = new NetworkMutator(
                 _networkCreator,
                 1,
-                0,
-                0,
-                0,
-                0,
+                0.5,
+                0.2,
+                0.1,
+                0.3,
                 1,
                 0,
                 0,
@@ -335,6 +334,239 @@ class NetworkMutatorTest {
         assertTrue(weight2 <= 2);
         assertTrue(weight1 >= -9);
         assertTrue(weight2 >= -9);
+    }
+
+    @Test
+    void forcedConnectionWeightMutationGeneratesNewRandomWeight() {
+        NetworkMutator mutator = new NetworkMutator(
+                _networkCreator,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                1,
+                0.005,
+                0,
+                0,
+                0,
+                1,
+                1,
+                1000,
+                false
+        );
+        mutator.mutate(_network_1);
+
+        assertTrue(_initialConnection_1.getWeight() >= 1.21 || _initialConnection_1.getWeight() <= 1.19);
+    }
+
+    @Test
+    void forcedConnectionWeightMutationAffectsWeightsAtTheCorrectProportion() {
+        NetworkMutator mutator = new NetworkMutator(
+                _networkCreator,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0.382,
+                0.5,
+                3,
+                0,
+                0,
+                0,
+                1,
+                1,
+                1000,
+                false
+        );
+        int amountWeightAffected = 0;
+        for (int i = 0; i < 1000; i++) {
+            _initialConnection_1.setWeight(0.2);
+            mutator.mutate(_network_1);
+            if (_initialConnection_1.getWeight() != 0.2){
+                amountWeightAffected++;
+            }
+        }
+
+        // 99,7% confidence interval
+        assertEquals(382, amountWeightAffected, 48);
+    }
+
+    @Test
+    void forcedNodeParameterMutationChangesNodeParameters() {
+        NetworkMutator mutator = new NetworkMutator(
+                _networkCreator,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0.2,
+                0.7,
+                1.2,
+                3.4,
+                1000,
+                false
+        );
+        assertEquals(0.8, _inputNode_1.getBias());
+        assertEquals(1.88, _inputNode_1.getActivationSteepness());
+        assertEquals(0.8, _outputNode_1.getBias());
+        assertEquals(1.88, _outputNode_1.getActivationSteepness());
+
+        mutator.mutate(_network_1);
+
+        assertNotEquals(0.8, _inputNode_1.getBias());
+        assertNotEquals(1.88, _inputNode_1.getActivationSteepness());
+        assertNotEquals(0.8, _outputNode_1.getBias());
+        assertNotEquals(1.88, _outputNode_1.getActivationSteepness());
+    }
+
+    @Test
+    void forcedNodeParameterMutationRespectsMaxPerturbationMagnitude() {
+        NetworkMutator mutator = new NetworkMutator(
+                _networkCreator,
+                0.5,
+                0.2,
+                1,
+                0.11,
+                0.12,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0.001,
+                0.01,
+                1000,
+                false
+        );
+        double biasBefore = _inputNode_1.getBias();
+        double activationSteepnessBefore = _inputNode_1.getActivationSteepness();
+        mutator.mutate(_network_1);
+        double biasAfter = _inputNode_1.getBias();
+        double activationSteepnessAfter = _inputNode_1.getActivationSteepness();
+        double absoluteDifferenceBias = Math.abs(biasBefore - biasAfter);
+        double absoluteDifferenceActivationSteepness = Math.abs(activationSteepnessBefore - activationSteepnessAfter);
+
+        assertTrue(absoluteDifferenceBias > 0);
+        assertTrue(absoluteDifferenceActivationSteepness > 0);
+        assertTrue(absoluteDifferenceBias <= 0.001);
+        assertTrue(absoluteDifferenceActivationSteepness <= 0.01);
+    }
+
+    @Test
+    void forcedNodeParameterMutationRespectsParameterLimits() {
+        NetworkMutator mutator = new NetworkMutator(
+                _networkCreator,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0.5,
+                0.5,
+                100000,
+                100000,
+                1000,
+                false
+        );
+        for (int i = 0; i < 1000; i++) {
+            mutator.mutate(_network_1);
+            double bias = _outputNode_1.getBias();
+            double activationSteepness = _outputNode_1.getActivationSteepness();
+
+            assertTrue(bias >=  -1);
+            assertTrue(bias <=  2);
+            assertTrue(activationSteepness >=  0.3);
+            assertTrue(activationSteepness <=  2);
+        }
+    }
+
+    @Test
+    void forcedNodeParameterMutationGeneratesNewRandomParameters() {
+        NetworkMutator mutator = new NetworkMutator(
+                _networkCreator,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                1,
+                1,
+                0.005,
+                0.005,
+                1000,
+                false
+        );
+        mutator.mutate(_network_1);
+
+        assertFalse(_inputNode_1.getBias() <= 0.81 && _inputNode_1.getBias() >= 0.79);
+        System.out.println(_inputNode_1.getActivationSteepness());
+        assertFalse(_inputNode_1.getActivationSteepness() <= 1.89 && _inputNode_1.getActivationSteepness() >= 1.87);
+    }
+
+    @Test
+    void forcedNodeParameterMutationAffectsWeightsAtTheCorrectProportion() {
+        NetworkMutator mutator = new NetworkMutator(
+                _networkCreator,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0.688,
+                0.7,
+                0.2,
+                10,
+                10,
+                1000,
+                false
+        );
+        int amountOfBiasesAffected = 0;
+        int amountOfActivationSteepnessesAffected = 0;
+
+        for (int i = 0; i < 1000; i++) {
+            _inputNode_1.setBias(-0.3);
+            _inputNode_1.setActivationSteepness(0.8);
+
+            mutator.mutate(_network_1);
+
+            if (_inputNode_1.getBias() != -0.3){
+                amountOfBiasesAffected++;
+            }
+            if (_inputNode_1.getActivationSteepness() != 0.8){
+                amountOfActivationSteepnessesAffected++;
+            }
+        }
+
+        // 99,7% confidence interval
+        assertEquals(688, amountOfBiasesAffected, 45);
+        assertEquals(688, amountOfActivationSteepnessesAffected, 45);
     }
 
     @Test
