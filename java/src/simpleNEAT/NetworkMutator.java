@@ -29,33 +29,75 @@ class NetworkMutator {
     private final boolean _addConnectionMutation_fallBackToConnectionWeightMutationOnFail;
 
     /**
+     /**
      * Class for mutating neural networks. Below is a list of possible mutations. All of them have a certain probability
      * of happening, as specifed by the parameters _"mutationName"Probability.
      * Note: A perturbation means adding a small quantity to an existing value, the maximum absolute value of that
      * quantity is here specified by the _mutationName_max*PerturbanceMagnitude parameters.
      *
-     * @param connectionDisabledMutationProbability Mutation effect: Each connection in the network, if it is affected, has its "disabled" state toggled.
-     * @param connectionWeightMutationProbability Mutation effect: Each connection in the network, should it be affected, has its weight either pertubed or gets a completely new random weight (probabilities of these outcomes are set via the other parameters).
-     * @param nodeParameterMutationProbability Mutation effect: Each node in the network, should it be affected, has its bias either pertubed or gets a completely new random bias, same for the activation steepness.
-     * @param addNodeMutationProbability Mutation effect: Finds a random connection in the network (if one exists), and splits it by effectively putting a node in the middle of the connection. That means that two new connections are created, and the original connection chosen is disabled.
-     * @param addConnectionMutationProbability Mutation effect: Finds two random unconnected nodes and adds a new connection between them with a random weight. It tries {@code _addConnectionMutation_maxTriesForConnectionSelection}-times to find a place for the new connection. If that fails and if {@code addConnectionMutation_fallBackToConnectionWeightMutationOnFail} is true, a connectionweightMutation is performed.
+     * @param networkCreator
+     * @param connectionDisabledMutationProbability Must be between 0 and 1 inclusive. Mutation effect: Each connection in the network, if it is affected, has its "disabled" state toggled.
+     * @param connectionWeightMutationProbability Must be between 0 and 1 inclusive. Mutation effect: Each connection in the network, should it be affected, has its weight either pertubed or gets a completely new random weight (probabilities of these outcomes are set via the other parameters).
+     * @param nodeParameterMutationProbability Must be between 0 and 1 inclusive. Mutation effect: Each node in the network, should it be affected, has its bias either pertubed or gets a completely new random bias, same for the activation steepness.
+     * @param addNodeMutationProbability Must be between 0 and 1 inclusive. Mutation effect: Finds a random connection in the network (if one exists), and splits it by effectively putting a node in the middle of the connection. That means that two new connections are created, and the original connection chosen is disabled.
+     * @param addConnectionMutationProbability Must be between 0 and 1 inclusive. Mutation effect: Finds two random unconnected nodes and adds a new connection between them with a random weight. It tries {@code _addConnectionMutation_maxTriesForConnectionSelection}-times to find a place for the new connection. If that fails and if {@code addConnectionMutation_fallBackToConnectionWeightMutationOnFail} is true, a connectionweightMutation is performed.
+     *
+     * @param connectionDisabledMutation_connectionAffectedProbability Must be between 0 and 1 inclusive.
+     *
+     * @param connectionWeightMutation_connectionAffectedProbability Must be between 0 and 1 inclusive.
+     * @param connectionWeightMutation_newRandomWeightProbability Must be between 0 and 1 inclusive.
+     * @param connectionWeightMutation_maxWeightPerturbanceMagnitude Must be non-negative.
+     *
+     * @param nodeParameterMutation_nodeAffectedProbability Must be between 0 and 1 inclusive.
+     * @param nodeParameterMutation_newRandomBiasProbability Must be between 0 and 1 inclusive.
+     * @param nodeParameterMutation_newRandomActivationSteepnessProbability Must be between 0 and 1 inclusive.
+     * @param nodeParameterMutation_maxBiasPerturbanceMagnitude Must be non-negative.
+     *
+     * @param nodeParameterMutation_maxActivationSteepnessPerturbanceMagnitude Must be non-negative.
+     * @param addConnectionMutation_maxTriesForConnectionSelection Must be at least 1.
+     * @param addConnectionMutation_fallBackToConnectionWeightMutationOnFail
      */
     NetworkMutator(NetworkCreator networkCreator, double connectionDisabledMutationProbability, double connectionWeightMutationProbability, double nodeParameterMutationProbability, double addNodeMutationProbability, double addConnectionMutationProbability, double connectionDisabledMutation_connectionAffectedProbability, double connectionWeightMutation_connectionAffectedProbability, double connectionWeightMutation_newRandomWeightProbability, double connectionWeightMutation_maxWeightPerturbanceMagnitude, double nodeParameterMutation_nodeAffectedProbability, double nodeParameterMutation_newRandomBiasProbability, double nodeParameterMutation_newRandomActivationSteepnessProbability, double nodeParameterMutation_maxBiasPerturbanceMagnitude, double nodeParameterMutation_maxActivationSteepnessPerturbanceMagnitude, int addConnectionMutation_maxTriesForConnectionSelection, boolean addConnectionMutation_fallBackToConnectionWeightMutationOnFail) {
+        assert 0 <= connectionDisabledMutationProbability && connectionDisabledMutationProbability <= 1 &&
+                0 <= connectionWeightMutationProbability && connectionWeightMutationProbability <= 1 &&
+                0 <= nodeParameterMutationProbability && nodeParameterMutationProbability <= 1 &&
+                0 <= addNodeMutationProbability && addNodeMutationProbability <= 1 &&
+                0 <= addConnectionMutationProbability && addConnectionMutationProbability <= 1 &&
+
+                0 <= connectionDisabledMutation_connectionAffectedProbability && connectionDisabledMutation_connectionAffectedProbability <= 1 &&
+
+                0 <= connectionWeightMutation_connectionAffectedProbability && connectionWeightMutation_connectionAffectedProbability <= 1 &&
+                0 <= connectionWeightMutation_newRandomWeightProbability && connectionWeightMutation_newRandomWeightProbability <= 1 &&
+                0 <= connectionWeightMutation_maxWeightPerturbanceMagnitude &&
+
+                0 <= nodeParameterMutation_nodeAffectedProbability && nodeParameterMutation_nodeAffectedProbability <= 1 &&
+                0 <= nodeParameterMutation_newRandomBiasProbability && nodeParameterMutation_newRandomBiasProbability <= 1 &&
+                0 <= nodeParameterMutation_newRandomActivationSteepnessProbability && nodeParameterMutation_newRandomActivationSteepnessProbability <= 1 &&
+                0 <= nodeParameterMutation_maxBiasPerturbanceMagnitude &&
+                0 <= nodeParameterMutation_maxActivationSteepnessPerturbanceMagnitude &&
+
+                1 <= addConnectionMutation_maxTriesForConnectionSelection;
+
         _networkCreator = networkCreator;
+
         _connectionDisabledMutationProbability = connectionDisabledMutationProbability;
         _connectionWeightMutationProbability = connectionWeightMutationProbability;
         _nodeParameterMutationProbability = nodeParameterMutationProbability;
         _addNodeMutationProbability = addNodeMutationProbability;
         _addConnectionMutationProbability = addConnectionMutationProbability;
+
         _connectionDisabledMutation_connectionAffectedProbability = connectionDisabledMutation_connectionAffectedProbability;
+
         _connectionWeightMutation_connectionAffectedProbability = connectionWeightMutation_connectionAffectedProbability;
         _connectionWeightMutation_newRandomWeightProbability = connectionWeightMutation_newRandomWeightProbability;
         _connectionWeightMutation_maxWeightPerturbanceMagnitude = connectionWeightMutation_maxWeightPerturbanceMagnitude;
+
         _nodeParameterMutation_nodeAffectedProbability = nodeParameterMutation_nodeAffectedProbability;
         _nodeParameterMutation_newRandomBiasProbability = nodeParameterMutation_newRandomBiasProbability;
         _nodeParameterMutation_newRandomActivationSteepnessProbability = nodeParameterMutation_newRandomActivationSteepnessProbability;
         _nodeParameterMutation_maxBiasPerturbanceMagnitude = nodeParameterMutation_maxBiasPerturbanceMagnitude;
         _nodeParameterMutation_maxActivationSteepnessPerturbanceMagnitude = nodeParameterMutation_maxActivationSteepnessPerturbanceMagnitude;
+
         _addConnectionMutation_maxTriesForConnectionSelection = addConnectionMutation_maxTriesForConnectionSelection;
         _addConnectionMutation_fallBackToConnectionWeightMutationOnFail = addConnectionMutation_fallBackToConnectionWeightMutationOnFail;
     }

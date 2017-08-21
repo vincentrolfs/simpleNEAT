@@ -51,6 +51,14 @@ public class NeuralNetwork {
         return _amountOutputNodes;
     }
 
+    public Double getFitness() {
+        return _fitness;
+    }
+
+    public void setFitness(Double fitness) {
+        _fitness = fitness;
+    }
+
     /**
      * Adds newNode to the nodes of this network. Ensures {@code getNodes().get(getNodes.size() - 1) == newNode}
      * @param newNode Must have innovationNumber that is not already used in the nodes of this network.
