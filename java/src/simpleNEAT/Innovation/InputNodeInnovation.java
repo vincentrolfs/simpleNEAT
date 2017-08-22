@@ -6,7 +6,7 @@ public class InputNodeInnovation extends Innovation {
 
     /**
      * @param generationCreated The generation in which this innovation was created. Must be non-negative.
-     * @param nodeNumber The index of the corresponding InputNode in the List of all InputNodes.
+     * @param nodeNumber        The index of the corresponding InputNode in the List of all InputNodes.
      */
     public InputNodeInnovation(int generationCreated, int nodeNumber) {
         super(generationCreated);

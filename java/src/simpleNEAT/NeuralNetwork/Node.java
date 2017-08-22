@@ -1,8 +1,5 @@
 package simpleNEAT.NeuralNetwork;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class Node {
 
     private int _innovationNumber;

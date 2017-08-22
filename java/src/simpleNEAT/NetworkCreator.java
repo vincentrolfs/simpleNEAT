@@ -1,6 +1,9 @@
 package simpleNEAT;
+
 import simpleNEAT.Innovation.*;
-import simpleNEAT.NeuralNetwork.*;
+import simpleNEAT.NeuralNetwork.Connection;
+import simpleNEAT.NeuralNetwork.NeuralNetwork;
+import simpleNEAT.NeuralNetwork.Node;
 
 import java.util.*;
 
@@ -31,7 +34,6 @@ public class NetworkCreator {
      * Creates new NetworkCreator. {@code _defaultConnectionWeight}, {@code _defaultConnectionWeight} and
      * {@code _defaultNodeActivationSteepness} are recommended to be chosen so that a default connection from a default
      * node into some other node behaves like the identity.
-     *
      * @param amountInputNodes                                  Must be at least 1.
      * @param amountOutputNodes                                 Must be at least 1.
      * @param connectionWeightMin                               Must satisfy {@code connectionWeightMin <= connectionWeightMax}.
@@ -88,28 +90,28 @@ public class NetworkCreator {
     /**
      * Signifies whether the given connection weight is in the allowed range.
      */
-    boolean isInConnectionWeightRange(double connectionWeight){
-        return _connectionWeightMin <= connectionWeight &&  connectionWeight <= _connectionWeightMax;
+    boolean isInConnectionWeightRange(double connectionWeight) {
+        return _connectionWeightMin <= connectionWeight && connectionWeight <= _connectionWeightMax;
     }
 
     /**
      * Caps connectionWeight so that it is between connectionWeightMin and connectionWeightMax
      */
-    double capConnectionWeight(double connectionWeight){
+    double capConnectionWeight(double connectionWeight) {
         return capDouble(connectionWeight, _connectionWeightMin, _connectionWeightMax);
     }
 
     /**
      * Caps nodeBias so that it is between nodeBiasMin and nodeBiasMax
      */
-    double capNodeBias(double nodeBias){
+    double capNodeBias(double nodeBias) {
         return capDouble(nodeBias, _nodeBiasMin, _nodeBiasMax);
     }
 
     /**
      * Caps capNodeActivationSteepness so that it is between nodeActivationSteepnessMin and nodeActivationSteepnessMax
      */
-    double capNodeActivationSteepness(double nodeActivationSteepness){
+    double capNodeActivationSteepness(double nodeActivationSteepness) {
         return capDouble(nodeActivationSteepness, _nodeActivationSteepnessMin, _nodeActivationSteepnessMax);
     }
 
@@ -117,9 +119,9 @@ public class NetworkCreator {
      * Creates a non-disabled connection with the given weight and the correct innovation number.
      * @param nodeOutOfId Must be non-negative.
      * @param nodeIntoId  Must be non-negative.
-     * @param weight Must satisfy isInConnectionWeightRange(weight)
+     * @param weight      Must satisfy isInConnectionWeightRange(weight)
      */
-    Connection createConnectionWithGivenWeight(int nodeOutOfId, int nodeIntoId, double weight){
+    Connection createConnectionWithGivenWeight(int nodeOutOfId, int nodeIntoId, double weight) {
         assert nodeOutOfId >= 0 && nodeIntoId >= 0 && isInConnectionWeightRange(weight);
 
         ConnectionInnovation innovation = new ConnectionInnovation(_currentGeneration, nodeOutOfId, nodeIntoId);
@@ -197,10 +199,10 @@ public class NetworkCreator {
         return innovationNumber;
     }
 
-    private ArrayList<Node> createInputNodes(){
+    private ArrayList<Node> createInputNodes() {
         ArrayList<Node> inputNodes = new ArrayList<>();
 
-        for (int i = 0; i < _amountInputNodes; i++){
+        for (int i = 0; i < _amountInputNodes; i++) {
             InputNodeInnovation innovation = new InputNodeInnovation(_currentGeneration, i);
             Node oneInputNode = createNodeWithDefaultAttributesFromInnovation(innovation);
 
@@ -210,10 +212,10 @@ public class NetworkCreator {
         return inputNodes;
     }
 
-    private ArrayList<Node> createOutputNodes(){
+    private ArrayList<Node> createOutputNodes() {
         ArrayList<Node> outputNodes = new ArrayList<>();
 
-        for (int i = 0; i < _amountOutputNodes; i++){
+        for (int i = 0; i < _amountOutputNodes; i++) {
             OutputNodeInnovation innovation = new OutputNodeInnovation(_currentGeneration, i);
             Node oneInputNode = createNodeWithDefaultAttributesFromInnovation(innovation);
 
@@ -223,18 +225,18 @@ public class NetworkCreator {
         return outputNodes;
     }
 
-    private Node createNodeWithDefaultAttributesFromInnovation(Innovation innovation){
+    private Node createNodeWithDefaultAttributesFromInnovation(Innovation innovation) {
         int innovationNumber = determineInnovationNumber(innovation);
         Node newNode = new Node(innovationNumber, _defaultNodeActivationSteepness, _defaultNodeBias);
 
         return newNode;
     }
 
-    private double capDouble(double value, double min, double max){
-        if (value < min){
+    private double capDouble(double value, double min, double max) {
+        if (value < min) {
             return min;
-        } else if (value > max){
-            return  max;
+        } else if (value > max) {
+            return max;
         } else {
             return value;
         }

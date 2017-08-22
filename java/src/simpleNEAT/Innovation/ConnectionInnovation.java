@@ -1,13 +1,13 @@
 package simpleNEAT.Innovation;
 
-public class ConnectionInnovation extends Innovation{
+public class ConnectionInnovation extends Innovation {
     private int _nodeOutOfId;
     private int _nodeIntoId;
 
     /**
      * @param generationCreated The generation in which this innovation was created. Must be non-negative.
-     * @param nodeOutOfId Must be non-negative.
-     * @param nodeIntoId Must be non-negative.
+     * @param nodeOutOfId       Must be non-negative.
+     * @param nodeIntoId        Must be non-negative.
      */
     public ConnectionInnovation(int generationCreated, int nodeOutOfId, int nodeIntoId) {
         super(generationCreated);

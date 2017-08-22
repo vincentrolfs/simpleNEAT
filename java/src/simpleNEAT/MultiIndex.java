@@ -30,7 +30,7 @@ class MultiIndex {
      * @param list Must be th size of getSize()
      * @return A list of the given lists evaluated at the position given by this multiindex.
      */
-    <T> List<T> getValuesOf(List<List<T>> list){
+    <T> List<T> getValuesOf(List<List<T>> list) {
         assert list.size() == _size;
 
         List<T> contents = new ArrayList<T>();
@@ -47,11 +47,11 @@ class MultiIndex {
      * Determines if the multiindex is smaller than the given list at every position.
      * @param list Must be the size of getSize();
      */
-    boolean isSmallerEverywhere(List<Integer> list){
+    boolean isSmallerEverywhere(List<Integer> list) {
         assert list.size() == _size;
 
         for (int i = 0; i < _size; i++) {
-            if (_indices[i] >= list.get(i)){
+            if (_indices[i] >= list.get(i)) {
                 return false;
             }
         }
@@ -72,7 +72,7 @@ class MultiIndex {
      * Increase multiindex by 1 at the given position.
      * @param position Must between 0 (inclusive) and getSize (exclusive).
      */
-    void increaseAt(int position){
+    void increaseAt(int position) {
         _indices[position]++;
     }
 }

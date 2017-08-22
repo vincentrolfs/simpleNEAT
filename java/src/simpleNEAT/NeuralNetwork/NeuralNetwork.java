@@ -15,12 +15,12 @@ public class NeuralNetwork {
     private Double _fitness;
 
     /**
-     * @param nodes Format: input nodes, then output nodes, then hidden nodes. Nodes must have distinct innovation numbers.
-     *              Must contain at least two nodes.
+     * @param nodes             Format: input nodes, then output nodes, then hidden nodes. Nodes must have distinct innovation numbers.
+     *                          Must contain at least two nodes.
      * @param connectionsSorted Must be sorted by innovationNumber. No two connections may both come out of the same
      *                          node and go into the same node. (This implies that no two connection may have the same
      *                          innovation numbers).
-     * @param amountInputNodes Must be at least 1.
+     * @param amountInputNodes  Must be at least 1.
      * @param amountOutputNodes Must be at least 1.
      */
     public NeuralNetwork(ArrayList<Node> nodes, LinkedList<Connection> connectionsSorted, int amountInputNodes, int amountOutputNodes) {
@@ -108,10 +108,10 @@ public class NeuralNetwork {
 
     /**
      * @param nodeOutOfId The innovation number of the node in the network that the connection in question goes out of.
-     * @param nodeIntoId The innovation number of a node in the network that the connection in question goes into.
+     * @param nodeIntoId  The innovation number of a node in the network that the connection in question goes into.
      */
-    public boolean hasConnectionBetween(Integer nodeOutOfId, Integer nodeIntoId){
-        return     isNodeIdInNetwork(nodeOutOfId)
+    public boolean hasConnectionBetween(Integer nodeOutOfId, Integer nodeIntoId) {
+        return isNodeIdInNetwork(nodeOutOfId)
                 && isNodeIdInNetwork(nodeIntoId)
                 && _connectedIntoLookup.get(nodeOutOfId).contains(nodeIntoId);
     }
@@ -119,20 +119,20 @@ public class NeuralNetwork {
     /**
      * @param nodeId The innovation number of a node.
      */
-    public boolean isNodeIdInNetwork(Integer nodeId){
+    public boolean isNodeIdInNetwork(Integer nodeId) {
         return _connectedIntoLookup.containsKey(nodeId);
     }
 
-    private void initializeNodes(ArrayList<Node> nodes){
+    private void initializeNodes(ArrayList<Node> nodes) {
         _nodes = new ArrayList<>();
         _connectedIntoLookup = new HashMap<>();
 
-        for (Node node : nodes){
+        for (Node node : nodes) {
             addNode(node);
         }
     }
 
-    private void initializeConnections(LinkedList<Connection> connectionsSorted){
+    private void initializeConnections(LinkedList<Connection> connectionsSorted) {
         int previousInnovationNumber = Integer.MIN_VALUE;
         for (Connection connection : connectionsSorted) {
             assert connection.getInnovationNumber() > previousInnovationNumber : "Connections not sorted by innovation number";
@@ -145,7 +145,7 @@ public class NeuralNetwork {
         _connectionsSorted = connectionsSorted;
     }
 
-    private void validateConnection(Connection connection){
+    private void validateConnection(Connection connection) {
         assert isNodeIdInNetwork(connection.getNodeOutOfId()) && isNodeIdInNetwork(connection.getNodeIntoId())
                 : "Connection does not fit the topology of the network";
         assert !hasConnectionBetween(connection.getNodeOutOfId(), connection.getNodeIntoId())
@@ -156,7 +156,7 @@ public class NeuralNetwork {
      * @param connection Must fit the topology of the network, i.e. newConnection.getNodeOutOfId() and
      *                   newConnection.getNodeIntoId() must be innovation numbers of nodes present in the network.
      */
-    private void addConnectionToLookup(Connection connection){
+    private void addConnectionToLookup(Connection connection) {
         Integer nodeOutOfId = connection.getNodeOutOfId();
         Integer nodeIntoId = connection.getNodeIntoId();
 

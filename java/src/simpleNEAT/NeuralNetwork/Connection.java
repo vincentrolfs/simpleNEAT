@@ -10,7 +10,7 @@ public class Connection {
 
     /**
      * @param nodeOutOf The innovation number of the node this connections goes out of. Must be non-negative.
-     * @param nodeInto The innovation number of the node this connections goes into. Must be non-negative.
+     * @param nodeInto  The innovation number of the node this connections goes into. Must be non-negative.
      */
     public Connection(int innovationNumber, int nodeOutOf, int nodeInto, double weight, boolean disabled) {
         assert innovationNumber >= 0;

@@ -10,7 +10,7 @@ public class HiddenNodeInnovation extends Innovation {
      */
     public HiddenNodeInnovation(int generationCreated, int connectionSplitId) {
         super(generationCreated);
-        assert  connectionSplitId >= 0;
+        assert connectionSplitId >= 0;
 
         this._connectionSplitId = connectionSplitId;
     }
