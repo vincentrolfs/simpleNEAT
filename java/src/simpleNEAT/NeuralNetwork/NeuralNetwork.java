@@ -35,6 +35,9 @@ public class NeuralNetwork {
         _fitness = null;
     }
 
+    /**
+     * Returns all nodes in the format: Input nodes, then output nodes, then hidden nodes.
+     */
     public ArrayList<Node> getNodes() {
         return _nodes;
     }

@@ -7,7 +7,7 @@ import simpleNEAT.NeuralNetwork.Node;
 
 import java.util.*;
 
-public class NetworkCreator {
+class NetworkCreator {
 
     private int _amountInputNodes;
     private int _amountOutputNodes;
@@ -26,9 +26,9 @@ public class NetworkCreator {
 
     private int _amountOfGenerationsRememberedForInnovationNumbers;
 
-    int _currentGeneration;
-    HashMap<Innovation, Integer> _innovationNumbers;
-    int _latestInnovationNumber;
+    private int _currentGeneration;
+    private HashMap<Innovation, Integer> _innovationNumbers;
+    private int _latestInnovationNumber;
 
     /**
      * Creates new NetworkCreator. {@code _defaultConnectionWeight}, {@code _defaultConnectionWeight} and
@@ -41,7 +41,7 @@ public class NetworkCreator {
      * @param nodeActivationSteepnessMin                        Must satisfy {@code nodeActivationSteepnessMin <= nodeActivationSteepnessMax}.
      * @param amountOfGenerationsRememberedForInnovationNumbers Must be non-negative.
      */
-    public NetworkCreator(int amountInputNodes, int amountOutputNodes, double connectionWeightMin, double connectionWeightMax, double defaultConnectionWeight, double nodeBiasMin, double nodeBiasMax, double defaultNodeBias, double nodeActivationSteepnessMin, double nodeActivationSteepnessMax, double defaultNodeActivationSteepness, int amountOfGenerationsRememberedForInnovationNumbers) {
+    NetworkCreator(int amountInputNodes, int amountOutputNodes, double connectionWeightMin, double connectionWeightMax, double defaultConnectionWeight, double nodeBiasMin, double nodeBiasMax, double defaultNodeBias, double nodeActivationSteepnessMin, double nodeActivationSteepnessMax, double defaultNodeActivationSteepness, int amountOfGenerationsRememberedForInnovationNumbers) {
         assert amountInputNodes >= 1 &&
                 amountOutputNodes >= 1 &&
                 connectionWeightMin <= connectionWeightMax &&
@@ -164,13 +164,8 @@ public class NetworkCreator {
      * Creates a new network consisting only of input and output nodes with default attributes, and no connections.
      */
     NeuralNetwork createMinimalNeuralNetwork() {
-        ArrayList<Node> inputNodes = createInputNodes();
-        ArrayList<Node> outputNodes = createOutputNodes();
-        ArrayList<Node> nodes = new ArrayList<>();
+        ArrayList<Node> nodes = createMinimalNodeList();
         LinkedList<Connection> connections = new LinkedList<>();
-
-        nodes.addAll(inputNodes);
-        nodes.addAll(outputNodes);
 
         return new NeuralNetwork(nodes, connections, _amountInputNodes, _amountOutputNodes);
     }
@@ -197,6 +192,15 @@ public class NetworkCreator {
         }
 
         return innovationNumber;
+    }
+
+    private ArrayList<Node> createMinimalNodeList(){
+        ArrayList<Node> nodes = createInputNodes();
+        ArrayList<Node> outputNodes = createOutputNodes();
+
+        nodes.addAll(outputNodes);
+
+        return nodes;
     }
 
     private ArrayList<Node> createInputNodes() {

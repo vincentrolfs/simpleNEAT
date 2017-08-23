@@ -26,6 +26,10 @@ class MultiIndex {
         return _size;
     }
 
+    int get(int position){
+        return _indices[position];
+    }
+
     /**
      * @param list Must be th size of getSize()
      * @return A list of the given lists evaluated at the position given by this multiindex.
