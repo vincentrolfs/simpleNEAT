@@ -31,12 +31,13 @@ class NetworkCreator {
     private int _latestInnovationNumber;
 
     /**
-     * Creates new NetworkCreator. {@code _defaultConnectionWeight}, {@code _defaultConnectionWeight} and
-     * {@code _defaultNodeActivationSteepness} are recommended to be chosen so that a default connection from a default
-     * node into some other node behaves like the identity.
+     * Creates new NetworkCreator. {@code defaultNodeBias} and
+     * {@code _defaultNodeActivationSteepness} are recommended to be chosen so that they act as the identity on their input.
      * @param amountInputNodes                                  Must be at least 1.
      * @param amountOutputNodes                                 Must be at least 1.
      * @param connectionWeightMin                               Must satisfy {@code connectionWeightMin <= connectionWeightMax}.
+     * @param defaultConnectionWeight                           Is used when a new connection is made during a node
+     *                                                          innovation is recommended to be close to 1.
      * @param nodeBiasMin                                       Must satisfy {@code nodeBiasMin <= nodeBiasMax}.
      * @param nodeActivationSteepnessMin                        Must satisfy {@code nodeActivationSteepnessMin <= nodeActivationSteepnessMax}.
      * @param amountOfGenerationsRememberedForInnovationNumbers Must be non-negative.

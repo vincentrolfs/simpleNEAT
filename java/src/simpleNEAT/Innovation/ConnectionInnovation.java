@@ -24,8 +24,7 @@ public class ConnectionInnovation extends Innovation {
 
         ConnectionInnovation that = (ConnectionInnovation) o;
 
-        if (_nodeOutOfId != that._nodeOutOfId) return false;
-        return _nodeIntoId == that._nodeIntoId;
+        return _nodeOutOfId == that._nodeOutOfId && _nodeIntoId == that._nodeIntoId;
     }
 
     @Override

@@ -2,7 +2,7 @@ package simpleNEAT.Innovation;
 
 public class OutputNodeInnovation extends Innovation {
 
-    int _nodeNumber;
+    final int _nodeNumber;
 
     /**
      * @param generationCreated The generation in which this innovation was created. Must be non-negative.

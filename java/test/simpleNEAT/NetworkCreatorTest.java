@@ -43,6 +43,30 @@ class NetworkCreatorTest {
     }
 
     @Test
+    void nonHiddenNodesOfNewNetworksGetSameInnovationNumber() {
+        NeuralNetwork network1 = _networkCreator.createMinimalNeuralNetwork();
+        NeuralNetwork network2 = _networkCreator.createMinimalNeuralNetwork();
+        List<Node> nodes1 = network1.getNodes();
+        List<Node> nodes2 = network2.getNodes();
+
+        for (int i = 0; i < 7; i++){
+            assertEquals(nodes1.get(i).getInnovationNumber(), nodes2.get(i).getInnovationNumber());
+        }
+    }
+
+    @Test
+    void newNetworksGetNewNodeObjects() {
+        NeuralNetwork network1 = _networkCreator.createMinimalNeuralNetwork();
+        NeuralNetwork network2 = _networkCreator.createMinimalNeuralNetwork();
+        List<Node> nodes1 = network1.getNodes();
+        List<Node> nodes2 = network2.getNodes();
+
+        for (int i = 0; i < 7; i++){
+            assertNotEquals(nodes1.get(i), nodes2.get(i));
+        }
+    }
+
+    @Test
     void newerConnectionGetsHigherInnovationNumber() {
         Connection connection1 = _networkCreator.createConnectionWithRandomWeight(2, 7);
         Connection connection2 = _networkCreator.createConnectionWithDefaultWeight(2, 0);
@@ -85,7 +109,7 @@ class NetworkCreatorTest {
     void sameConnectionInnovationGetsSameInnovationNumberEvenInLaterGeneration() {
         Connection connection1 = _networkCreator.createConnectionWithRandomWeight(223, 722);
         _networkCreator.nextGeneration();
-        Connection connection2 = _networkCreator.createConnectionWithRandomWeight(282, 3);
+        _networkCreator.createConnectionWithRandomWeight(282, 3);
         _networkCreator.nextGeneration();
         _networkCreator.nextGeneration();
         Connection connection3 = _networkCreator.createConnectionWithRandomWeight(223, 722);

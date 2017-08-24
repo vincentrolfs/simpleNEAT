@@ -8,7 +8,7 @@ import java.util.*;
 
 public class NetworkMater {
 
-    private double _inclusionOfConnectionsFromLessFitParentProbability;
+    private final double _inclusionOfConnectionsFromLessFitParentProbability;
 
     private class OffspringBuilder {
         NeuralNetwork _parent0;
@@ -21,6 +21,7 @@ public class NetworkMater {
         OffspringBuilder(NeuralNetwork parent0, NeuralNetwork parent1) {
             assert parent0.getAmountInputNodes() == parent1.getAmountInputNodes() &&
                     parent0.getAmountOutputNodes() == parent1.getAmountOutputNodes();
+            assert parent0.getFitness() != null && parent1.getFitness() != null : "Both parents must have fitness set";
 
             _parent0 = parent0;
             _parent1 = parent1;
@@ -46,7 +47,7 @@ public class NetworkMater {
          * the connections!
          */
         void addConnection(Connection connection){
-            _offspringConnections.add(connection);
+            _offspringConnections.add(new Connection(connection));
             addNodeByIdIfNotAddedAlready(connection.getNodeOutOfId());
             addNodeByIdIfNotAddedAlready(connection.getNodeIntoId());
         }
@@ -104,7 +105,7 @@ public class NetworkMater {
         }
 
         private void forceAddNode(Node node){
-            _offspringNodes.add(node);
+            _offspringNodes.add(new Node(node));
             _alreadyAddedNodeInnovationNumbers.add(node.getInnovationNumber());
         }
     }
@@ -113,6 +114,10 @@ public class NetworkMater {
         this._inclusionOfConnectionsFromLessFitParentProbability = inclusionOfConnectionsFromLessFitParentProbability;
     }
 
+    /**
+     * Creates offspring from the two parents. Both parents must have their fitness set and the amount of input/output
+     * nodes must be the same for both.
+     */
     NeuralNetwork createOffspring(NeuralNetwork parent0, NeuralNetwork parent1) {
         OffspringBuilder offspringBuilder = new OffspringBuilder(parent0, parent1);
 

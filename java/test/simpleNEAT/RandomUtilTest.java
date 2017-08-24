@@ -69,7 +69,7 @@ class RandomUtilTest {
 
         for (int i = 0; i < 10000; i++) {
             String value = RandomUtil.sampleFrom(list);
-            if (value == "a"){
+            if (value.equals("a")){
                 amountA++;
             }
         }

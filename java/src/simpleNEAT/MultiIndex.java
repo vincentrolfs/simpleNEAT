@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 class MultiIndex {
-    private int _size;
-    private int[] _indices;
+    private final int _size;
+    private final int[] _indices;
 
     MultiIndex(int size) {
         _size = size;
