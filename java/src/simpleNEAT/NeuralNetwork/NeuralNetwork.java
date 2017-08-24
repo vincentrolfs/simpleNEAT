@@ -12,6 +12,7 @@ public class NeuralNetwork {
     private int _amountOutputNodes;
 
     private Map<Integer, Set<Integer>> _connectedIntoLookup;
+    private Map<Integer, Node> _nodeLookup;
     private Double _fitness;
 
     /**
@@ -26,7 +27,14 @@ public class NeuralNetwork {
     public NeuralNetwork(ArrayList<Node> nodes, LinkedList<Connection> connectionsSorted, int amountInputNodes, int amountOutputNodes) {
         assert nodes.size() >= 2 && amountInputNodes >= 1 && amountOutputNodes >= 1;
 
+        _nodes = new ArrayList<>();
+        _connectedIntoLookup = new HashMap<>();
+        _nodeLookup = new HashMap<>();
+
         initializeNodes(nodes);
+
+        _connectionsSorted = null;
+
         initializeConnections(connectionsSorted);
 
         _amountInputNodes = amountInputNodes;
@@ -44,6 +52,13 @@ public class NeuralNetwork {
 
     public LinkedList<Connection> getConnectionsSorted() {
         return _connectionsSorted;
+    }
+
+    /**
+     * Gets the node withe the given innovation number. Returns null if there is none.
+     */
+    public Node getNodeByInnovationNumber(int innovationNumber){
+        return _nodeLookup.get(innovationNumber);
     }
 
     public int getAmountInputNodes() {
@@ -67,9 +82,11 @@ public class NeuralNetwork {
      * @param newNode Must have innovationNumber that is not already used in the nodes of this network.
      */
     public void addNode(Node newNode) {
-        assert !isNodeIdInNetwork(newNode.getInnovationNumber()) : "Saw same node innovationNumber twice";
+        assert !isNodeIdInNetwork(newNode.getInnovationNumber()) :
+                "The new node innovation number is already present in the network";
 
         _connectedIntoLookup.put(newNode.getInnovationNumber(), new HashSet<>());
+        _nodeLookup.put(newNode.getInnovationNumber(), newNode);
         _nodes.add(newNode);
     }
 
@@ -83,7 +100,7 @@ public class NeuralNetwork {
      *                      newConnection.getNodeIntoId() must be innovation numbers of nodes present in the network.
      */
     public void addConnection(Connection newConnection) {
-        validateConnection(newConnection);
+        processNewConnection(newConnection);
 
         // Using iterators for better performance with LinkedList
         ListIterator<Connection> iterator = _connectionsSorted.listIterator(_connectionsSorted.size());
@@ -105,8 +122,6 @@ public class NeuralNetwork {
         if (!iterator.hasPrevious()) {
             iterator.add(newConnection);
         }
-
-        addConnectionToLookup(newConnection);
     }
 
     /**
@@ -123,29 +138,31 @@ public class NeuralNetwork {
      * @param nodeId The innovation number of a node.
      */
     public boolean isNodeIdInNetwork(Integer nodeId) {
-        return _connectedIntoLookup.containsKey(nodeId);
+        return _nodeLookup.containsKey(nodeId);
     }
 
     private void initializeNodes(ArrayList<Node> nodes) {
-        _nodes = new ArrayList<>();
-        _connectedIntoLookup = new HashMap<>();
-
         for (Node node : nodes) {
             addNode(node);
         }
     }
 
-    private void initializeConnections(LinkedList<Connection> connectionsSorted) {
+    private void  initializeConnections(LinkedList<Connection> connectionsSorted) {
         int previousInnovationNumber = Integer.MIN_VALUE;
+
         for (Connection connection : connectionsSorted) {
             assert connection.getInnovationNumber() > previousInnovationNumber : "Connections not sorted by innovation number";
-
             previousInnovationNumber = connection.getInnovationNumber();
-            validateConnection(connection);
-            addConnectionToLookup(connection);
+
+            processNewConnection(connection);
         }
 
         _connectionsSorted = connectionsSorted;
+    }
+
+    private void processNewConnection(Connection connection){
+        validateConnection(connection);
+        addConnectionToLookup(connection);
     }
 
     private void validateConnection(Connection connection) {

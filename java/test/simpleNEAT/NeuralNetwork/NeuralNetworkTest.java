@@ -66,9 +66,22 @@ class NeuralNetworkTest {
         assertTrue(_network.isNodeIdInNetwork(1));
         assertTrue(_network.isNodeIdInNetwork(12));
         assertTrue(_network.isNodeIdInNetwork(7));
+
         assertFalse(_network.isNodeIdInNetwork(0));
         assertFalse(_network.isNodeIdInNetwork(5));
         assertFalse(_network.isNodeIdInNetwork(127684));
+    }
+
+    @Test
+    void getNodeByInnovationNumberWorksCorrectlyAfterConstruction() {
+        assertEquals(_node1, _network.getNodeByInnovationNumber(12));
+        assertEquals(_node2, _network.getNodeByInnovationNumber(1));
+        assertEquals(_node3, _network.getNodeByInnovationNumber(7));
+
+        assertEquals(null, _network.getNodeByInnovationNumber(0));
+        assertEquals(null, _network.getNodeByInnovationNumber(4));
+        assertEquals(null, _network.getNodeByInnovationNumber(237818));
+        assertEquals(null, _network.getNodeByInnovationNumber(88));
     }
 
     @Test
@@ -91,6 +104,13 @@ class NeuralNetworkTest {
         Node node4 = new Node(9, 23.1, 4);
         _network.addNode(node4);
         assertTrue(_network.isNodeIdInNetwork(9));
+    }
+
+    @Test
+    void addedNodeCanBeRetrievedByInnovationNumber() {
+        Node node4 = new Node(93, -23.1, 2);
+        _network.addNode(node4);
+        assertEquals(node4, _network.getNodeByInnovationNumber(93));
     }
 
     @Test

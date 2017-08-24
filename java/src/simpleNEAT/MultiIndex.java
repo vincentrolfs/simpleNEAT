@@ -26,7 +26,7 @@ class MultiIndex {
         return _size;
     }
 
-    int get(int position){
+    int getOneIndex(int position){
         return _indices[position];
     }
 
