@@ -110,7 +110,13 @@ public class NetworkMater {
         }
     }
 
+    /**
+     * @param inclusionOfConnectionsFromLessFitParentProbability Must be between 0 and 1 inclusive.
+     */
     public NetworkMater(double inclusionOfConnectionsFromLessFitParentProbability) {
+        assert  inclusionOfConnectionsFromLessFitParentProbability >= 0 &&
+                inclusionOfConnectionsFromLessFitParentProbability <= 1;
+
         this._inclusionOfConnectionsFromLessFitParentProbability = inclusionOfConnectionsFromLessFitParentProbability;
     }
 

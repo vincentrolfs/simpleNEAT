@@ -22,6 +22,14 @@ public class Connection {
         _disabled = disabled;
     }
 
+    public Connection(Connection connection) {
+        _innovationNumber = connection._innovationNumber;
+        _nodeOutOf = connection._nodeOutOf;
+        _nodeInto = connection._nodeInto;
+        _weight = connection._weight;
+        _disabled = connection._disabled;
+    }
+
     public int getInnovationNumber() {
         return _innovationNumber;
     }

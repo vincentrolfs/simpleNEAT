@@ -522,7 +522,6 @@ class NetworkMutatorTest {
         mutator.mutate(_network_1);
 
         assertFalse(_inputNode_1.getBias() <= 0.81 && _inputNode_1.getBias() >= 0.79);
-        System.out.println(_inputNode_1.getActivationSteepness());
         assertFalse(_inputNode_1.getActivationSteepness() <= 1.89 && _inputNode_1.getActivationSteepness() >= 1.87);
     }
 

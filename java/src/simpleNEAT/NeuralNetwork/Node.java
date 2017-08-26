@@ -17,6 +17,12 @@ public class Node {
         _bias = bias;
     }
 
+    public Node(Node node) {
+        _innovationNumber = node._innovationNumber;
+        _activationSteepness = node._activationSteepness;
+        _bias = node._bias;
+    }
+
     public int getInnovationNumber() {
         return _innovationNumber;
     }
