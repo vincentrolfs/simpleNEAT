@@ -1,6 +1,6 @@
 package simpleNEAT.NeuralNetwork;
 
-public class Connection {
+public class Connection implements InnovationNumberObject{
 
     private int _innovationNumber;
     private int _nodeOutOf;

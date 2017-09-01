@@ -1,6 +1,7 @@
 package simpleNEAT;
 
 import simpleNEAT.NeuralNetwork.Connection;
+import simpleNEAT.NeuralNetwork.InnovationNumberObject;
 import simpleNEAT.NeuralNetwork.NeuralNetwork;
 import simpleNEAT.NeuralNetwork.Node;
 
@@ -11,180 +12,109 @@ public class NetworkMater {
     private final double _inclusionOfConnectionsFromLessFitParentProbability;
 
     private class OffspringBuilder {
-        NeuralNetwork _parent0;
-        NeuralNetwork _parent1;
-
+        LinkedList<Node> _offspringNodes;
         LinkedList<Connection> _offspringConnections;
-        ArrayList<Node> _offspringNodes;
-        Set<Integer> _alreadyAddedNodeInnovationNumbers;
 
-        OffspringBuilder(NeuralNetwork parent0, NeuralNetwork parent1) {
-            assert parent0.getAmountInputNodes() == parent1.getAmountInputNodes() &&
-                    parent0.getAmountOutputNodes() == parent1.getAmountOutputNodes();
-            assert parent0.getFitness() != null && parent1.getFitness() != null : "Both parents must have fitness set";
-
-            _parent0 = parent0;
-            _parent1 = parent1;
-
+        OffspringBuilder() {
+            _offspringNodes = new LinkedList<>();
             _offspringConnections = new LinkedList<>();
-            _offspringNodes = new ArrayList<>();
-            _alreadyAddedNodeInnovationNumbers = new HashSet<>();
-
-            addNonHiddenNodes();
         }
 
-        NeuralNetwork build(){
+        NeuralNetwork build(int amountInputNodes, int amountOutputNodes){
             return new NeuralNetwork(
                     _offspringNodes,
                     _offspringConnections,
-                    _parent0.getAmountInputNodes(),
-                    _parent0.getAmountOutputNodes()
+                    amountInputNodes,
+                    amountOutputNodes
             );
         }
 
         /**
-         * Adds connection and needed nodes to the builder. Must be called in order of innovation numbers of
-         * the connections!
+         * @param <T> Must be either Node or Connection.
          */
-        void addConnection(Connection connection){
-            _offspringConnections.add(new Connection(connection));
-            addNodeByIdIfNotAddedAlready(connection.getNodeOutOfId());
-            addNodeByIdIfNotAddedAlready(connection.getNodeIntoId());
-        }
-
-        private void addNodeByIdIfNotAddedAlready(int innovationNumber){
-            NeuralNetwork selectedParent = determineParentForNode(innovationNumber);
-            Node selectedNode = selectedParent.getNodeByInnovationNumber(innovationNumber);
-
-            addNodeIfIdNotAddedAlready(selectedNode);
-        }
-
-        private NeuralNetwork determineParentForNode(int innovationNumber) {
-            if (!_parent0.isNodeIdInNetwork(innovationNumber)){
-                return _parent1;
-            } else if (!_parent1.isNodeIdInNetwork(innovationNumber)){
-                return _parent0;
+        <T> void addStructure(T structure){
+            if (structure instanceof Node){
+                addNode(structure);
+            } else if (structure instanceof Connection){
+                addConnection(structure);
             } else {
-                return getRandomParent();
+                throw new AssertionError("Cannot add structure that is neither Node nor Connection.");
             }
         }
 
-        private void addNonHiddenNodes(){
-            int amountNonHiddenNodes = getAmountNonHiddenNodes();
-
-            for (int nodeIndex = 0; nodeIndex < amountNonHiddenNodes; nodeIndex++) {
-                addOneNonHiddenNode(nodeIndex);
-            }
+        private <T> void addNode(T structure) {
+            Node original = (Node) structure;
+            Node clone = new Node(original);
+            _offspringNodes.add(clone);
         }
 
-        private int getAmountNonHiddenNodes() {
-            int amountInputNodes = _parent0.getAmountInputNodes();
-            int amountOutputNodes = _parent0.getAmountOutputNodes();
-
-            return  amountInputNodes + amountOutputNodes;
-        }
-
-        private void addOneNonHiddenNode(int nodeIndex) {
-            NeuralNetwork selectedParent = getRandomParent();
-            List<Node> allNodes = selectedParent.getNodes();
-            Node selectedNode = allNodes.get(nodeIndex);
-
-            forceAddNode(selectedNode);
-        }
-
-        private NeuralNetwork getRandomParent(){
-            return RandomUtil.getRandomBoolean(0.5)? _parent0 : _parent1;
-        }
-
-        private void addNodeIfIdNotAddedAlready(Node node){
-            int innovationNumber = node.getInnovationNumber();
-
-            if (!_alreadyAddedNodeInnovationNumbers.contains(innovationNumber)){
-                forceAddNode(node);
-            }
-        }
-
-        private void forceAddNode(Node node){
-            _offspringNodes.add(new Node(node));
-            _alreadyAddedNodeInnovationNumbers.add(node.getInnovationNumber());
+        private <T> void addConnection(T structure) {
+            Connection original = (Connection) structure;
+            Connection clone = new Connection(original);
+            _offspringConnections.add(clone);
         }
     }
 
-    private class MultiIndex {
-        private final int _size;
+    private class DoubleIndex {
         private final int[] _indices;
 
-        MultiIndex(int size) {
-            _size = size;
-            _indices = initializeIndices();
-        }
-
-        private int[] initializeIndices() {
-            int[] indices = new int[_size];
-
-            for (int i = 0; i < _size; i++) {
-                indices[i] = 0;
-            }
-
-            return indices;
-        }
-
-        int getSize() {
-            return _size;
-        }
-
-        int getOneIndex(int position){
-            return _indices[position];
+        /**
+         * A DoubleIndex is a tuple that contains two indices for two different lists.
+         * The two lists will normally contaned in another list of length two.
+         */
+        DoubleIndex() {
+            _indices = new int[] {0, 0};
         }
 
         /**
-         * @param list Must be th size of getSize()
-         * @return A list of the given lists evaluated at the position given by this multiindex.
+         * @param lists Must be of size 2
+         * @return A list of the given lists evaluated at the position given by this multiindex. If one of the indices
+         * in the multiindex is not in the range of the corresponding list, {@code null} is put at that position.
          */
-        <T> List<T> getValuesOf(List<List<T>> list) {
-            assert list.size() == _size;
+        <T> List<T> tryGetValuesOf(List<List<T>> lists) {
+            assert lists.size() == 2;
 
-            List<T> contents = new ArrayList<T>();
+            List<T> values = new ArrayList<T>();
 
-            for (int i = 0; i < _size; i++) {
-                int j = _indices[i];
-                contents.add(list.get(i).get(j));
-            }
+            values.add(tryGetSingleValue(lists.get(0), _indices[0]));
+            values.add(tryGetSingleValue(lists.get(1), _indices[1]));
 
-            return contents;
+            return values;
         }
 
         /**
-         * Determines if the multiindex is smaller than the given list at every position.
-         * @param list Must be the size of getSize();
+         * Determines if the double index is at at least one position in the range of the corresponding list
+         * in @{code lists}.
+         * @param lists Must be of size 2.
          */
-        boolean isSmallerEverywhere(List<Integer> list) {
-            assert list.size() == _size;
+        <T> boolean isPartlyInRange(List<List<T>> lists) {
+            assert lists.size() == 2;
 
-            for (int i = 0; i < _size; i++) {
-                if (_indices[i] >= list.get(i)) {
-                    return false;
-                }
-            }
-
-            return true;
+            return _indices[0] < lists.get(0).size() || _indices[1] < lists.get(1).size();
         }
 
         /**
          * Increase multiindex everywhere by 1.
          */
         void increaseAll() {
-            for (int i = 0; i < _size; i++) {
-                increaseAt(i);
-            }
+            _indices[0]++;
+            _indices[1]++;
         }
 
         /**
-         * Increase multiindex by 1 at the given position.
-         * @param position Must between 0 (inclusive) and getSize (exclusive).
+         * Increase double index by 1 at the given position.
+         * @param position Must between 0 and 1 inclusive.
          */
         void increaseAt(int position) {
             _indices[position]++;
+        }
+
+        private <T> T tryGetSingleValue(List<T> list, int index){
+            if (index < list.size()){
+                return list.get(index);
+            } else {
+                return null;
+            }
         }
     }
 
@@ -198,132 +128,38 @@ public class NetworkMater {
         this._inclusionOfConnectionsFromLessFitParentProbability = inclusionOfConnectionsFromLessFitParentProbability;
     }
 
-    /**
-     * Creates offspring from the two parents. Both parents must have their fitness set and the amount of input/output
-     * nodes must be the same for both.
-     */
     NeuralNetwork createOffspring(NeuralNetwork parent0, NeuralNetwork parent1) {
-        OffspringBuilder offspringBuilder = new OffspringBuilder(parent0, parent1);
+        assert parent0.getAmountInputNodes() == parent1.getAmountInputNodes() &&
+                parent0.getAmountOutputNodes() == parent1.getAmountOutputNodes();
 
-        List<List<Connection>> parentConnections = getParentConnections(parent0, parent1);
-        List<Integer> parentConnectionsSizes = getParentConnectionsSizes(parentConnections);
+        int positionOfFitterParent = determinePositionOfFitterParent(parent0, parent1);
+        boolean includeStructuresFromLessFitParent = decideInclusionOfConnectionsFromLessFitParent();
+        OffspringBuilder offspringBuilder = new OffspringBuilder();
 
-        MultiIndex multiIndex = new MultiIndex(2);
-
-        int fitterParentNumber = determineFitterParent(parent0, parent1);
-        boolean includeConnectionsFromLessFitParent = decideInclusionOfConnectionsFromLessFitParent();
-
-        while (multiIndex.isSmallerEverywhere(parentConnectionsSizes)) {
-            List<Connection> currentConnections = multiIndex.getValuesOf(parentConnections);
-            List<Integer> innovationNumbers = getInnovationNumbers(currentConnections);
-
-            if (innovationNumbers.get(0).equals(innovationNumbers.get(1))) {
-                handleMatchingConnection(offspringBuilder, currentConnections, multiIndex);
-            } else {
-                handleNonMatchingConnection(offspringBuilder, currentConnections, multiIndex,
-                         innovationNumbers, fitterParentNumber, includeConnectionsFromLessFitParent);
-            }
-        }
-
-        handleRemainingConnections(offspringBuilder,
-                parentConnections, parentConnectionsSizes, multiIndex,
-                fitterParentNumber, includeConnectionsFromLessFitParent);
-
-        return offspringBuilder.build();
-    }
-
-    private void handleMatchingConnection(OffspringBuilder offspringBuilder,
-                                          List<Connection> currentConnections, MultiIndex multiIndex) {
-        Connection connection = RandomUtil.sampleFrom(currentConnections);
-        offspringBuilder.addConnection(connection);
-        multiIndex.increaseAll();
-    }
-
-    private void handleNonMatchingConnection(OffspringBuilder offspringBuilder,
-                                             List<Connection> currentConnections, MultiIndex multiIndex,
-                                             List<Integer> innovationNumbers, int fitterParentNumber,
-                                             boolean includeConnectionsFromLessFitParent) {
-        int youngerConnectionNumber = determineYoungerConnectionNumber(innovationNumbers);
-
-        if (youngerConnectionNumber == fitterParentNumber || includeConnectionsFromLessFitParent) {
-            Connection youngerConnection = currentConnections.get(youngerConnectionNumber);
-            offspringBuilder.addConnection(youngerConnection);
-        }
-        multiIndex.increaseAt(youngerConnectionNumber);
-    }
-
-    private void handleRemainingConnections(OffspringBuilder offspringBuilder,
-                                            List<List<Connection>> parentConnections,
-                                            List<Integer> parentConnectionsSizes, MultiIndex multiIndex,
-                                            int fitterParentNumber, boolean includeConnectionsFromLessFitParent) {
-        Integer parentWithRemainingConnectionsNumber = getParentWithRemainingConnectionsNumber(
-                parentConnectionsSizes, multiIndex
+        mateStructures(
+                parent0.getNodesSorted(),
+                parent1.getNodesSorted(),
+                offspringBuilder,
+                positionOfFitterParent,
+                includeStructuresFromLessFitParent
         );
 
-        if (parentWithRemainingConnectionsNumber == null) {
-            return;
-        }
+        mateStructures(
+                parent0.getConnectionsSorted(),
+                parent1.getConnectionsSorted(),
+                offspringBuilder,
+                positionOfFitterParent,
+                includeStructuresFromLessFitParent
+        );
 
-        if (parentWithRemainingConnectionsNumber != fitterParentNumber && !includeConnectionsFromLessFitParent){
-            return;
-        }
-
-        int index = multiIndex.getOneIndex(parentWithRemainingConnectionsNumber);
-        int size = parentConnectionsSizes.get(parentWithRemainingConnectionsNumber);
-        List<Connection> connections = parentConnections.get(parentWithRemainingConnectionsNumber);
-
-        for ( ; index < size; index++ ){
-            Connection connection = connections.get(index);
-            offspringBuilder.addConnection(connection);
-        }
-    }
-
-    /**
-     * Gets the number (0 or 1) of the parent that still has unseen connections remaining. At this stage at most
-     * one of the two parents has still unseen connections. Returns null if neither parent has unseen connections.
-     */
-    private Integer getParentWithRemainingConnectionsNumber(List<Integer> parentConnectionsSizes, MultiIndex multiIndex) {
-        boolean parent0HasRemainingConnections = (multiIndex.getOneIndex(0) < parentConnectionsSizes.get(0));
-        boolean parent1HasRemainingConnections = (multiIndex.getOneIndex(1) < parentConnectionsSizes.get(1));
-
-        assert !(parent0HasRemainingConnections && parent1HasRemainingConnections);
-
-        if (parent0HasRemainingConnections){
-            return 0;
-        } else if (parent1HasRemainingConnections){
-            return 1;
-        } else {
-            return null;
-        }
-    }
-
-    private List<Integer> getInnovationNumbers(List<Connection> connections) {
-        List<Integer> innovationNumbers = new ArrayList<>();
-        innovationNumbers.add(connections.get(0).getInnovationNumber());
-        innovationNumbers.add(connections.get(1).getInnovationNumber());
-
-        return  innovationNumbers;
-    }
-
-    private int determineYoungerConnectionNumber(List<Integer> currentInnovationNumbers) {
-        if (currentInnovationNumbers.get(0) < currentInnovationNumbers.get(1)) {
-            return 0;
-        } else if (currentInnovationNumbers.get(0) > currentInnovationNumbers.get(1)) {
-            return 1;
-        } else {
-            throw new AssertionError("Both connection numbers are the same but they shouldn't be.");
-        }
-    }
-
-    private boolean decideInclusionOfConnectionsFromLessFitParent() {
-        return RandomUtil.getRandomBoolean(_inclusionOfConnectionsFromLessFitParentProbability);
+        return offspringBuilder.build(parent0.getAmountInputNodes(), parent0.getAmountOutputNodes());
     }
 
     /**
      * Returns 0 if the first parent is fitter, 1 if the second parent is fitter, and a random value of either 0 or 1 if
      * they have the same fitness.
      */
-    private int determineFitterParent(NeuralNetwork parent0, NeuralNetwork parent1) {
+    private int determinePositionOfFitterParent(NeuralNetwork parent0, NeuralNetwork parent1) {
         double fitness0 = parent0.getFitness();
         double fitness1 = parent1.getFitness();
 
@@ -336,20 +172,88 @@ public class NetworkMater {
         }
     }
 
-    private List<List<Connection>> getParentConnections(NeuralNetwork parent0, NeuralNetwork parent1) {
-        List<List<Connection>> parentConnections = new ArrayList<>();
-        parentConnections.add(parent0.getConnectionsSorted());
-        parentConnections.add(parent1.getConnectionsSorted());
-
-        return parentConnections;
+    private boolean decideInclusionOfConnectionsFromLessFitParent() {
+        return RandomUtil.getRandomBoolean(_inclusionOfConnectionsFromLessFitParentProbability);
     }
 
-    private List<Integer> getParentConnectionsSizes(List<List<Connection>> parentConnections) {
-        List<Integer> parentConnectionsSizes = new ArrayList<>();
-        parentConnectionsSizes.add(parentConnections.get(0).size());
-        parentConnectionsSizes.add(parentConnections.get(1).size());
+    private <T extends InnovationNumberObject> void mateStructures(List<T> structures0, List<T> structures1,
+                                                                   OffspringBuilder offspringBuilder,
+                                                                   int positionOfFitterParent,
+                                                                   boolean includeStructuresFromLessFitParent) {
+        DoubleIndex doubleIndex = new DoubleIndex();
+        List<List<T>> structures = combineIntoList(structures0, structures1);
 
-        return parentConnectionsSizes;
+        while (doubleIndex.isPartlyInRange(structures)) {
+            List<T> currentStructures = doubleIndex.tryGetValuesOf(structures);
+            List<Integer> innovationNumbers = tryGetInnovationNumbers(currentStructures);
+
+            if (null != innovationNumbers.get(0) && innovationNumbers.get(0).equals(innovationNumbers.get(1))) {
+                handleMatchingStructure(offspringBuilder, currentStructures, doubleIndex);
+            } else {
+                handleNonMatchingStructure(offspringBuilder, currentStructures, doubleIndex,
+                        innovationNumbers, positionOfFitterParent, includeStructuresFromLessFitParent);
+            }
+        }
+    }
+
+    private <T> List<T> combineIntoList(T element0, T element1) {
+        List<T> list = new ArrayList<>();
+        list.add(element0);
+        list.add(element1);
+
+        return list;
+    }
+
+    /**
+     * Returns a list of the innovation numbers of the given objects. If one of the objects is null, the returned
+     * list will be null at that position.
+     */
+    private <T extends InnovationNumberObject> List<Integer> tryGetInnovationNumbers(List<T> structures) {
+        List<Integer> innovationNumbers = new ArrayList<>();
+        Integer innovationNumber0 = structures.get(0) == null? null : structures.get(0).getInnovationNumber();
+        Integer innovationNumber1 = structures.get(1) == null? null : structures.get(1).getInnovationNumber();
+
+        innovationNumbers.add(innovationNumber0);
+        innovationNumbers.add(innovationNumber1);
+
+        return innovationNumbers;
+    }
+
+    private <T> void handleMatchingStructure(OffspringBuilder offspringBuilder,
+                                          List<T> currentStructures, DoubleIndex doubleIndex) {
+        T structure = RandomUtil.sampleFrom(currentStructures);
+        offspringBuilder.addStructure(structure);
+        doubleIndex.increaseAll();
+    }
+
+    private <T> void handleNonMatchingStructure(OffspringBuilder offspringBuilder,
+                                             List<T> currentStructures, DoubleIndex doubleIndex,
+                                             List<Integer> innovationNumbers, int positionOfFitterParent,
+                                             boolean includeConnectionsFromLessFitParent) {
+        int positionOfYoungerStructure = determinePositionOfYoungerStructure(innovationNumbers);
+
+        if (positionOfYoungerStructure == positionOfFitterParent || includeConnectionsFromLessFitParent) {
+            T youngerStructure = currentStructures.get(positionOfYoungerStructure);
+            offspringBuilder.addStructure(youngerStructure);
+        }
+        doubleIndex.increaseAt(positionOfYoungerStructure);
+    }
+
+    private int determinePositionOfYoungerStructure(List<Integer> currentInnovationNumbers) {
+        Integer id0 = currentInnovationNumbers.get(0);
+        Integer id1 = currentInnovationNumbers.get(1);
+
+        if (id0 == null){
+            return 1;
+        } else if (id1 == null) {
+            return 0;
+        } else if (id0 < id1) {
+            return 0;
+        } else if (id1 < id0) {
+            return 1;
+        } else {
+            throw new AssertionError("Both structures have the same innovation number.");
+        }
     }
 
 }

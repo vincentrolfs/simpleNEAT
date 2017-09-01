@@ -165,7 +165,7 @@ class NetworkCreator {
      * Creates a new network consisting only of input and output nodes with default attributes, and no connections.
      */
     NeuralNetwork createMinimalNeuralNetwork() {
-        ArrayList<Node> nodes = createMinimalNodeList();
+        LinkedList<Node> nodes = createMinimalNodeList();
         LinkedList<Connection> connections = new LinkedList<>();
 
         return new NeuralNetwork(nodes, connections, _amountInputNodes, _amountOutputNodes);
@@ -195,17 +195,17 @@ class NetworkCreator {
         return innovationNumber;
     }
 
-    private ArrayList<Node> createMinimalNodeList(){
-        ArrayList<Node> nodes = createInputNodes();
-        ArrayList<Node> outputNodes = createOutputNodes();
+    private LinkedList<Node> createMinimalNodeList(){
+        LinkedList<Node> nodes = createInputNodes();
+        LinkedList<Node> outputNodes = createOutputNodes();
 
         nodes.addAll(outputNodes);
 
         return nodes;
     }
 
-    private ArrayList<Node> createInputNodes() {
-        ArrayList<Node> inputNodes = new ArrayList<>();
+    private LinkedList<Node> createInputNodes() {
+        LinkedList<Node> inputNodes = new LinkedList<>();
 
         for (int i = 0; i < _amountInputNodes; i++) {
             InputNodeInnovation innovation = new InputNodeInnovation(_currentGeneration, i);
@@ -217,8 +217,8 @@ class NetworkCreator {
         return inputNodes;
     }
 
-    private ArrayList<Node> createOutputNodes() {
-        ArrayList<Node> outputNodes = new ArrayList<>();
+    private LinkedList<Node> createOutputNodes() {
+        LinkedList<Node> outputNodes = new LinkedList<>();
 
         for (int i = 0; i < _amountOutputNodes; i++) {
             OutputNodeInnovation innovation = new OutputNodeInnovation(_currentGeneration, i);

@@ -28,7 +28,7 @@ class NetworkCreatorTest {
     @Test
     void createsMinimalNeuralNetworkCorrectly() {
         NeuralNetwork network = _networkCreator.createMinimalNeuralNetwork();
-        List<Node> nodes = network.getNodes();
+        List<Node> nodes = network.getNodesSorted();
         List<Connection> connectionsSorted = network.getConnectionsSorted();
 
         assertEquals(3, network.getAmountInputNodes());
@@ -46,8 +46,8 @@ class NetworkCreatorTest {
     void nonHiddenNodesOfNewNetworksGetSameInnovationNumber() {
         NeuralNetwork network1 = _networkCreator.createMinimalNeuralNetwork();
         NeuralNetwork network2 = _networkCreator.createMinimalNeuralNetwork();
-        List<Node> nodes1 = network1.getNodes();
-        List<Node> nodes2 = network2.getNodes();
+        List<Node> nodes1 = network1.getNodesSorted();
+        List<Node> nodes2 = network2.getNodesSorted();
 
         for (int i = 0; i < 7; i++){
             assertEquals(nodes1.get(i).getInnovationNumber(), nodes2.get(i).getInnovationNumber());
@@ -58,8 +58,8 @@ class NetworkCreatorTest {
     void newNetworksGetNewNodeObjects() {
         NeuralNetwork network1 = _networkCreator.createMinimalNeuralNetwork();
         NeuralNetwork network2 = _networkCreator.createMinimalNeuralNetwork();
-        List<Node> nodes1 = network1.getNodes();
-        List<Node> nodes2 = network2.getNodes();
+        List<Node> nodes1 = network1.getNodesSorted();
+        List<Node> nodes2 = network2.getNodesSorted();
 
         for (int i = 0; i < 7; i++){
             assertNotEquals(nodes1.get(i), nodes2.get(i));

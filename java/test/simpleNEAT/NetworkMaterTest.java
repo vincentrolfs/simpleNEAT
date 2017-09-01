@@ -1,7 +1,6 @@
 package simpleNEAT;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import simpleNEAT.NeuralNetwork.Connection;
 import simpleNEAT.NeuralNetwork.NeuralNetwork;
@@ -38,8 +37,8 @@ class NetworkMaterTest {
 
     @Test
     void matesMinimalNetworksCorrectly() {
-        List<Node> nodes1 = _network1.getNodes();
-        List<Node> nodes2 = _network2.getNodes();
+        List<Node> nodes1 = _network1.getNodesSorted();
+        List<Node> nodes2 = _network2.getNodesSorted();
 
         nodes1.get(0).setBias(0.8);
         nodes2.get(0).setBias(0.8);
@@ -49,7 +48,7 @@ class NetworkMaterTest {
 
         NeuralNetwork child = _networkMater.createOffspring(_network1, _network2);
         List<Connection> childConnections = child.getConnectionsSorted();
-        List<Node> childNodes = child.getNodes();
+        List<Node> childNodes = child.getNodesSorted();
 
         assertEquals(0, childConnections.size());
         assertEquals(8, childNodes.size());
@@ -69,20 +68,20 @@ class NetworkMaterTest {
 
     @Test
     void matesOneMatchingConnectionCorrectly() {
-        int nodeOutOfId = _network1.getNodes().get(2).getInnovationNumber();
-        int nodeIntoId = _network1.getNodes().get(6).getInnovationNumber();
+        int nodeOutOfId = _network1.getNodesSorted().get(2).getInnovationNumber();
+        int nodeIntoId = _network1.getNodesSorted().get(6).getInnovationNumber();
 
         _network1.addConnection(_networkCreator.createConnectionWithGivenWeight(nodeOutOfId, nodeIntoId, 0.8));
         _network2.addConnection(_networkCreator.createConnectionWithGivenWeight(nodeOutOfId, nodeIntoId, 0.1));
 
         NeuralNetwork child = _networkMater.createOffspring(_network1, _network2);
         assertEquals(1, child.getConnectionsSorted().size());
-        assertEquals(8, child.getNodes().size());
+        assertEquals(8, child.getNodesSorted().size());
 
         double childConnectionWeight = child.getConnectionsSorted().get(0).getWeight();
         assertTrue(childConnectionWeight == 0.8 || childConnectionWeight == 0.1);
 
-        List<Node> childNodes = child.getNodes();
+        List<Node> childNodes = child.getNodesSorted();
         for (int i = 0; i < 8; i++) {
             Node oneChildNode = childNodes.get(i);
 
@@ -93,8 +92,8 @@ class NetworkMaterTest {
 
     @Test
     void chooseEachParentForMatchingConnections50PercentOfTheTime() {
-        int nodeOutOfId = _network1.getNodes().get(2).getInnovationNumber();
-        int nodeIntoId = _network1.getNodes().get(6).getInnovationNumber();
+        int nodeOutOfId = _network1.getNodesSorted().get(2).getInnovationNumber();
+        int nodeIntoId = _network1.getNodesSorted().get(6).getInnovationNumber();
 
         _network1.addConnection(_networkCreator.createConnectionWithGivenWeight(nodeOutOfId, nodeIntoId, 0.8));
         _network2.addConnection(_networkCreator.createConnectionWithGivenWeight(nodeOutOfId, nodeIntoId, 0.1));
@@ -118,9 +117,11 @@ class NetworkMaterTest {
     @Test
     void ifSpecifiedKeepsNonMatchingConnectionsOnlyFromFitterParent() {
         NetworkMater networkMater = new NetworkMater(0);
-        List<Node> nodes1 = _network1.getNodes();
-        List<Node> nodes2 = _network2.getNodes();
+        List<Node> nodes1 = _network1.getNodesSorted();
+        List<Node> nodes2 = _network2.getNodesSorted();
 
+        // network 1: X XX
+        // network 2:  X XX
         Connection newConnectionA1 = _networkCreator.createConnectionWithGivenWeight(
                 nodes1.get(0).getInnovationNumber(),
                 nodes1.get(4).getInnovationNumber(),
@@ -128,75 +129,133 @@ class NetworkMaterTest {
         );
 
         Connection newConnectionB2 = _networkCreator.createConnectionWithGivenWeight(
-                nodes1.get(1).getInnovationNumber(),
-                nodes1.get(5).getInnovationNumber(),
+                nodes2.get(1).getInnovationNumber(),
+                nodes2.get(5).getInnovationNumber(),
                 -0.44
         );
-        Connection newConnectionC2 = _networkCreator.createConnectionWithGivenWeight(
-                nodes1.get(3).getInnovationNumber(),
+
+        Connection newConnectionC1 = _networkCreator.createConnectionWithGivenWeight(
+                nodes1.get(0).getInnovationNumber(),
+                nodes1.get(0).getInnovationNumber(),
+                0.12
+        );
+
+        Connection newConnectionD1 = _networkCreator.createConnectionWithGivenWeight(
                 nodes1.get(1).getInnovationNumber(),
+                nodes1.get(2).getInnovationNumber(),
+                0.3
+        );
+
+        Connection newConnectionD2 = _networkCreator.createConnectionWithGivenWeight(
+                nodes1.get(1).getInnovationNumber(),
+                nodes1.get(2).getInnovationNumber(),
+                0.3
+        );
+
+        Connection newConnectionE2 = _networkCreator.createConnectionWithGivenWeight(
+                nodes2.get(3).getInnovationNumber(),
+                nodes2.get(1).getInnovationNumber(),
                 -1
         );
 
         _network1.addConnection(newConnectionA1);
+        _network1.addConnection(newConnectionC1);
+        _network1.addConnection(newConnectionD1);
 
         _network2.addConnection(newConnectionB2);
-        _network2.addConnection(newConnectionC2);
+        _network2.addConnection(newConnectionD2);
+        _network2.addConnection(newConnectionE2);
 
         NeuralNetwork child = networkMater.createOffspring(_network1, _network2);
-        List<Node> childNodes = child.getNodes();
+        List<Node> childNodes = child.getNodesSorted();
         List<Connection> childConnections = child.getConnectionsSorted();
 
         assertEquals(8, childNodes.size());
-        assertEquals(2, childConnections.size());
+        assertEquals(3, childConnections.size());
 
         assertEquals(newConnectionB2.getInnovationNumber(), childConnections.get(0).getInnovationNumber());
-        assertEquals(newConnectionC2.getInnovationNumber(), childConnections.get(1).getInnovationNumber());
+        assertEquals(newConnectionD2.getInnovationNumber(), childConnections.get(1).getInnovationNumber());
+        assertEquals(newConnectionE2.getInnovationNumber(), childConnections.get(2).getInnovationNumber());
 
         assertEquals(-0.44, childConnections.get(0).getWeight());
-        assertEquals(-1, childConnections.get(1).getWeight());
+        assertEquals(0.3, childConnections.get(1).getWeight());
+        assertEquals(-1, childConnections.get(2).getWeight());
     }
 
     @Test
     void keepNonMatchingConnectionFromLessFitParentTheCorrectAmountOfTimes() {
         NetworkMater networkMater = new NetworkMater(0.68);
-        List<Node> nodes1 = _network1.getNodes();
-        List<Node> nodes2 = _network2.getNodes();
+        List<Node> nodes1 = _network1.getNodesSorted();
+        List<Node> nodes2 = _network2.getNodesSorted();
 
-        Connection newConnection1 = _networkCreator.createConnectionWithRandomWeight(
+        // network 1: X XX
+        // network 2:  X XX
+        Connection newConnectionA1 = _networkCreator.createConnectionWithGivenWeight(
+                nodes1.get(0).getInnovationNumber(),
                 nodes1.get(4).getInnovationNumber(),
-                nodes1.get(4).getInnovationNumber()
+                0.12
         );
-        _network1.addConnection(newConnection1);
 
-        Connection newConnection2 = _networkCreator.createConnectionWithRandomWeight(
-                nodes2.get(4).getInnovationNumber(),
-                nodes2.get(7).getInnovationNumber()
+        Connection newConnectionB2 = _networkCreator.createConnectionWithGivenWeight(
+                nodes2.get(1).getInnovationNumber(),
+                nodes2.get(5).getInnovationNumber(),
+                -0.44
         );
-        _network2.addConnection(newConnection2);
 
-        int amountConnection1Kept = 0;
+        Connection newConnectionC1 = _networkCreator.createConnectionWithGivenWeight(
+                nodes1.get(0).getInnovationNumber(),
+                nodes1.get(0).getInnovationNumber(),
+                0.12
+        );
+
+        Connection newConnectionD1 = _networkCreator.createConnectionWithGivenWeight(
+                nodes1.get(1).getInnovationNumber(),
+                nodes1.get(2).getInnovationNumber(),
+                0.3
+        );
+
+        Connection newConnectionD2 = _networkCreator.createConnectionWithGivenWeight(
+                nodes1.get(1).getInnovationNumber(),
+                nodes1.get(2).getInnovationNumber(),
+                0.3
+        );
+
+        Connection newConnectionE2 = _networkCreator.createConnectionWithGivenWeight(
+                nodes2.get(3).getInnovationNumber(),
+                nodes2.get(1).getInnovationNumber(),
+                -1
+        );
+
+        _network1.addConnection(newConnectionA1);
+        _network1.addConnection(newConnectionC1);
+        _network1.addConnection(newConnectionD1);
+
+        _network2.addConnection(newConnectionB2);
+        _network2.addConnection(newConnectionD2);
+        _network2.addConnection(newConnectionE2);
+
+        int amountConnectionsFromLessFitParentKept = 0;
 
         for (int i = 0; i < 10000; i++){
             NeuralNetwork child = networkMater.createOffspring(_network1, _network2);
             int amountConnections = child.getConnectionsSorted().size();
 
-            if (amountConnections == 2){
-                amountConnection1Kept++;
+            if (amountConnections == 5){
+                amountConnectionsFromLessFitParentKept++;
             } else {
-                assertEquals(1, amountConnections);
+                assertEquals(3, amountConnections);
             }
         }
 
         // 99,7% confidence interval
-        assertEquals(amountConnection1Kept, 6800, 140);
+        assertEquals(amountConnectionsFromLessFitParentKept, 6800, 140);
     }
 
     @Test
     void doesNotKeepDisconnectedNodes() {
         NetworkMater networkMater = new NetworkMater(0);
-        List<Node> nodes1 = _network1.getNodes();
-        List<Node> nodes2 = _network2.getNodes();
+        List<Node> nodes1 = _network1.getNodesSorted();
+        List<Node> nodes2 = _network2.getNodesSorted();
 
         Connection newConnectionA1 = _networkCreator.createConnectionWithGivenWeight(
                 nodes1.get(0).getInnovationNumber(),
@@ -223,7 +282,7 @@ class NetworkMaterTest {
         _network2.addConnection(newConnectionA2);
 
         NeuralNetwork child = networkMater.createOffspring(_network1, _network2);
-        List<Node> childNodes = child.getNodes();
+        List<Node> childNodes = child.getNodesSorted();
         List<Connection> childConnections = child.getConnectionsSorted();
 
         assertEquals(8, childNodes.size());
@@ -234,8 +293,8 @@ class NetworkMaterTest {
     @Test
     void keepsConnectedNodes() {
         NetworkMater networkMater = new NetworkMater(1);
-        List<Node> nodes1 = _network1.getNodes();
-        List<Node> nodes2 = _network2.getNodes();
+        List<Node> nodes1 = _network1.getNodesSorted();
+        List<Node> nodes2 = _network2.getNodesSorted();
 
         Connection newConnectionA1 = _networkCreator.createConnectionWithGivenWeight(
                 nodes1.get(2).getInnovationNumber(),
@@ -270,7 +329,7 @@ class NetworkMaterTest {
         _network2.addConnection(newConnectionD2);
 
         NeuralNetwork child = networkMater.createOffspring(_network1, _network2);
-        List<Node> childNodes = child.getNodes();
+        List<Node> childNodes = child.getNodesSorted();
         List<Connection> childConnections = child.getConnectionsSorted();
 
         assertEquals(10, childNodes.size());
@@ -278,11 +337,43 @@ class NetworkMaterTest {
 
         assertEquals(newNode1.getInnovationNumber(), childNodes.get(8).getInnovationNumber());
         assertEquals(0.111, childNodes.get(8).getBias());
-        assertNotEquals(newNode1, childNodes.get(8));
 
         assertEquals(newNode2.getInnovationNumber(), childNodes.get(9).getInnovationNumber());
         assertEquals(0.222, childNodes.get(9).getActivationSteepness());
-        assertNotEquals(newNode2, childNodes.get(9));
 
+    }
+
+    @Test
+    void createsNewNodeAndConnectionObjects() {
+        NetworkMater networkMater = new NetworkMater(1);
+        List<Node> nodes1 = _network1.getNodesSorted();
+        List<Node> nodes2 = _network2.getNodesSorted();
+
+        Connection newConnectionA1 = _networkCreator.createConnectionWithRandomWeight(
+                nodes1.get(4).getInnovationNumber(),
+                nodes1.get(4).getInnovationNumber()
+        );
+        _network1.addConnection(newConnectionA1);
+
+        Connection newConnectionB2 = _networkCreator.createConnectionWithRandomWeight(
+                nodes2.get(4).getInnovationNumber(),
+                nodes2.get(7).getInnovationNumber()
+        );
+        _network2.addConnection(newConnectionB2);
+
+        NeuralNetwork child = networkMater.createOffspring(_network1, _network2);
+        List<Node> childNodes = child.getNodesSorted();
+        List<Connection> childConnections = child.getConnectionsSorted();
+
+        for (int i = 0; i < childNodes.size(); i++) {
+            assertNotEquals(childNodes.get(i), nodes1.get(i));
+            assertNotEquals(childNodes.get(i), nodes2.get(i));
+        }
+
+        assertNotEquals(childConnections.get(0), newConnectionA1);
+        assertNotEquals(childConnections.get(0), newConnectionB2);
+
+        assertNotEquals(childConnections.get(1), newConnectionA1);
+        assertNotEquals(childConnections.get(1), newConnectionB2);
     }
 }

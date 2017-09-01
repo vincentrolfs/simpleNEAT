@@ -1,6 +1,6 @@
 package simpleNEAT.NeuralNetwork;
 
-public class Node {
+public class Node implements InnovationNumberObject {
 
     private int _innovationNumber;
     private double _activationSteepness;

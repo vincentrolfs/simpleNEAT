@@ -152,7 +152,7 @@ class NetworkMutator {
     }
 
     private void performNodeParameterMutation(NeuralNetwork network) {
-        List<Node> allNodes = network.getNodes();
+        List<Node> allNodes = network.getNodesSorted();
 
         for (Node someNode : allNodes) {
             if (RandomUtil.getRandomBoolean(_nodeParameterMutation_nodeAffectedProbability)) {
@@ -205,7 +205,7 @@ class NetworkMutator {
     }
 
     private void performAddConnectionMutation(NeuralNetwork network) {
-        List<Node> nodes = network.getNodes();
+        List<Node> nodes = network.getNodesSorted();
         int nodeOutOfId = -1;
         int nodeIntoId = -1;
         boolean newConnectionIdentified = false;

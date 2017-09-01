@@ -7,7 +7,7 @@ import simpleNEAT.NeuralNetwork.Connection;
 import simpleNEAT.NeuralNetwork.NeuralNetwork;
 import simpleNEAT.NeuralNetwork.Node;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -48,7 +48,7 @@ class NetworkMutatorTest {
 
     private void initializeNetwork1() {
         _network_1 = _networkCreator.createMinimalNeuralNetwork();
-        List<Node> initialNodes = _network_1.getNodes();
+        List<Node> initialNodes = _network_1.getNodesSorted();
         _inputNode_1 = initialNodes.get(0);
         _outputNode_1 = initialNodes.get(1);
 
@@ -62,7 +62,7 @@ class NetworkMutatorTest {
 
     private void initializeNetwork2() {
         _network_2 = _networkCreator.createMinimalNeuralNetwork();
-        List<Node> initialNodes = _network_2.getNodes();
+        List<Node> initialNodes = _network_2.getNodesSorted();
         _inputNode_2 = initialNodes.get(0);
         _outputNode_2 = initialNodes.get(1);
 
@@ -130,7 +130,7 @@ class NetworkMutatorTest {
     }
 
     private void validateNetwork1() {
-        ArrayList<Node> nodesExpected = new ArrayList<Node> (){{
+        LinkedList<Node> nodesExpected = new LinkedList<Node> (){{
             add(_inputNode_1);
             add(_outputNode_1);
         }};
@@ -138,14 +138,14 @@ class NetworkMutatorTest {
             add(_initialConnection_1);
         }};
 
-        assertEquals(nodesExpected, _network_1.getNodes());
+        assertEquals(nodesExpected, _network_1.getNodesSorted());
         assertEquals(connectionsExpected, _network_1.getConnectionsSorted());
         assertEquals(1, _network_1.getAmountInputNodes());
         assertEquals(1, _network_1.getAmountOutputNodes());
     }
 
     private void validateNetwork2() {
-        ArrayList<Node> nodesExpected = new ArrayList<Node> (){{
+        LinkedList<Node> nodesExpected = new LinkedList<Node> (){{
             add(_inputNode_2);
             add(_outputNode_2);
         }};
@@ -154,7 +154,7 @@ class NetworkMutatorTest {
             add(_initialConnection_o_o_2);
         }};
 
-        assertEquals(nodesExpected, _network_2.getNodes());
+        assertEquals(nodesExpected, _network_2.getNodesSorted());
         assertEquals(connectionsExpected, _network_2.getConnectionsSorted());
 
         assertEquals(1, _network_2.getAmountInputNodes());
@@ -173,8 +173,8 @@ class NetworkMutatorTest {
                 1,
                 0.5,
                 0.2,
-                0.1,
-                0.3,
+                0,
+                0,
                 1,
                 0,
                 0,
@@ -187,7 +187,11 @@ class NetworkMutatorTest {
                 1000,
                 false
         );
+
+        System.out.println(_network_2.getConnectionsSorted().size());
         mutator.mutate(_network_2);
+        System.out.println(_network_2.getConnectionsSorted().size());
+
         List<Connection> connections = _network_2.getConnectionsSorted();
         LinkedList<Connection> connectionsExpected = new LinkedList<Connection> (){{
             add(_initialConnection_i_o_2);
@@ -573,7 +577,7 @@ class NetworkMutatorTest {
         NeuralNetwork network = _networkCreator.createMinimalNeuralNetwork();
         _mutatorForForcedAddNodeMutation.mutate(network);
 
-        List<Node> nodes = network.getNodes();
+        List<Node> nodes = network.getNodesSorted();
         List<Connection> connectionsSorted = network.getConnectionsSorted();
 
         assertEquals(2, nodes.size());
@@ -583,7 +587,7 @@ class NetworkMutatorTest {
     @Test
     void forcedAddNodeMutationResultsInThreeNodes(){
         _mutatorForForcedAddNodeMutation.mutate(_network_1);
-        List<Node> nodes = _network_1.getNodes();
+        List<Node> nodes = _network_1.getNodesSorted();
 
         assertEquals(3, nodes.size());
     }
@@ -591,7 +595,7 @@ class NetworkMutatorTest {
     @Test
     void forcedAddNodeMutationInsertsNewNodeCorrectly(){
         _mutatorForForcedAddNodeMutation.mutate(_network_1);
-        List<Node> nodes = _network_1.getNodes();
+        List<Node> nodes = _network_1.getNodesSorted();
 
         assertEquals(_inputNode_1, nodes.get(0));
         assertEquals(_outputNode_1, nodes.get(1));
@@ -616,7 +620,7 @@ class NetworkMutatorTest {
     @Test
     void forcedAddNodeMutationInsertsNewConnectionsCorrectly(){
         _mutatorForForcedAddNodeMutation.mutate(_network_1);
-        List<Node> nodes= _network_1.getNodes();
+        List<Node> nodes= _network_1.getNodesSorted();
         List<Connection> connectionsSorted = _network_1.getConnectionsSorted();
         Node newNode = nodes.get(2);
         Connection newConnectionIn = connectionsSorted.get(1);
@@ -656,7 +660,7 @@ class NetworkMutatorTest {
     @Test
     void forcedAddNodeMutationCreatesNewNodeWithCorrectAttributes() {
         _mutatorForForcedAddNodeMutation.mutate(_network_1);
-        List<Node> nodes = _network_1.getNodes();
+        List<Node> nodes = _network_1.getNodesSorted();
         Node newNode = nodes.get(2);
 
         assertEquals(1.88, newNode.getActivationSteepness());
@@ -666,8 +670,8 @@ class NetworkMutatorTest {
     @Test
     void fullyConnectedNetworkMakesAddConnectionMutationFallBackToConnectionWeightMutation() {
         NeuralNetwork network = _networkCreator.createMinimalNeuralNetwork();
-        int inputNodeId = network.getNodes().get(0).getInnovationNumber();
-        int outputNodeId = network.getNodes().get(1).getInnovationNumber();
+        int inputNodeId = network.getNodesSorted().get(0).getInnovationNumber();
+        int outputNodeId = network.getNodesSorted().get(1).getInnovationNumber();
 
         Connection connection1 = _networkCreator.createConnectionWithGivenWeight(inputNodeId, inputNodeId, -2);
         Connection connection2 = _networkCreator.createConnectionWithGivenWeight(outputNodeId, outputNodeId, -2);
