@@ -13,9 +13,9 @@ public class NeuralNetwork {
     private Double _fitness;
 
     /**
-     * @param nodesSorted       Must be sorted by innovation number. Must be in order input nodes, output ndoes, hidden nodes.
+     * @param nodesSorted       Must be sorted by innovation number. Must be in order input nodes, output nodes, hidden nodes.
      *                          Nodes must have distinct innovation numbers.
-     *                          Must contain at least two nodesSorted.
+     *                          Must contain at least two nodes.
      * @param connectionsSorted Must be sorted by innovationNumber. No two connections may both come out of the same
      *                          node and go into the same node. (This implies that no two connection may have the same
      *                          innovation numbers).
