@@ -1,5 +1,7 @@
 package simpleNEAT;
 
+import simpleNEAT.InnovationNumberObjectPairIterator.InnovationNumberObjectPairIterator;
+import simpleNEAT.InnovationNumberObjectPairIterator.Pair;
 import simpleNEAT.NeuralNetwork.Connection;
 import simpleNEAT.NeuralNetwork.InnovationNumberObject;
 import simpleNEAT.NeuralNetwork.NeuralNetwork;
@@ -20,7 +22,7 @@ public class NetworkMater {
             _offspringConnections = new LinkedList<>();
         }
 
-        NeuralNetwork build(int amountInputNodes, int amountOutputNodes){
+        NeuralNetwork build(int amountInputNodes, int amountOutputNodes) {
             return new NeuralNetwork(
                     _offspringNodes,
                     _offspringConnections,
@@ -32,10 +34,10 @@ public class NetworkMater {
         /**
          * @param <T> Must be either Node or Connection.
          */
-        <T> void addStructure(T structure){
-            if (structure instanceof Node){
+        <T> void addStructure(T structure) {
+            if (structure instanceof Node) {
                 addNode(structure);
-            } else if (structure instanceof Connection){
+            } else if (structure instanceof Connection) {
                 addConnection(structure);
             } else {
                 throw new AssertionError("Cannot add structure that is neither Node nor Connection.");
@@ -63,7 +65,7 @@ public class NetworkMater {
          * The two lists will normally contaned in another list of length two.
          */
         DoubleIndex() {
-            _indices = new int[] {0, 0};
+            _indices = new int[]{0, 0};
         }
 
         /**
@@ -85,6 +87,7 @@ public class NetworkMater {
         /**
          * Determines if the double index is at at least one position in the range of the corresponding list
          * in @{code lists}.
+         *
          * @param lists Must be of size 2.
          */
         <T> boolean isPartlyInRange(List<List<T>> lists) {
@@ -103,14 +106,15 @@ public class NetworkMater {
 
         /**
          * Increase double index by 1 at the given position.
+         *
          * @param position Must between 0 and 1 inclusive.
          */
         void increaseAt(int position) {
             _indices[position]++;
         }
 
-        private <T> T tryGetSingleValue(List<T> list, int index){
-            if (index < list.size()){
+        private <T> T tryGetSingleValue(List<T> list, int index) {
+            if (index < list.size()) {
                 return list.get(index);
             } else {
                 return null;
@@ -122,7 +126,7 @@ public class NetworkMater {
      * @param inclusionOfConnectionsFromLessFitParentProbability Must be between 0 and 1 inclusive.
      */
     public NetworkMater(double inclusionOfConnectionsFromLessFitParentProbability) {
-        assert  inclusionOfConnectionsFromLessFitParentProbability >= 0 &&
+        assert inclusionOfConnectionsFromLessFitParentProbability >= 0 &&
                 inclusionOfConnectionsFromLessFitParentProbability <= 1;
 
         this._inclusionOfConnectionsFromLessFitParentProbability = inclusionOfConnectionsFromLessFitParentProbability;
@@ -180,80 +184,34 @@ public class NetworkMater {
                                                                    OffspringBuilder offspringBuilder,
                                                                    int positionOfFitterParent,
                                                                    boolean includeStructuresFromLessFitParent) {
-        DoubleIndex doubleIndex = new DoubleIndex();
-        List<List<T>> structures = combineIntoList(structures0, structures1);
+        InnovationNumberObjectPairIterator<T> iterator = new InnovationNumberObjectPairIterator<>(structures0, structures1);
 
-        while (doubleIndex.isPartlyInRange(structures)) {
-            List<T> currentStructures = doubleIndex.tryGetValuesOf(structures);
-            List<Integer> innovationNumbers = tryGetInnovationNumbers(currentStructures);
+        while (iterator.hasNext()) {
+            Pair<T> currentStructures = iterator.next();
 
-            if (null != innovationNumbers.get(0) && innovationNumbers.get(0).equals(innovationNumbers.get(1))) {
-                handleMatchingStructure(offspringBuilder, currentStructures, doubleIndex);
+            if (currentStructures.hasNullElement()) {
+                handleNonMatchingStructure(offspringBuilder, currentStructures, positionOfFitterParent,
+                        includeStructuresFromLessFitParent);
             } else {
-                handleNonMatchingStructure(offspringBuilder, currentStructures, doubleIndex,
-                        innovationNumbers, positionOfFitterParent, includeStructuresFromLessFitParent);
+                handleMatchingStructure(offspringBuilder, currentStructures);
             }
         }
     }
 
-    private <T> List<T> combineIntoList(T element0, T element1) {
-        List<T> list = new ArrayList<>();
-        list.add(element0);
-        list.add(element1);
+    private <T> void handleNonMatchingStructure(OffspringBuilder offspringBuilder, Pair<T> currentStructures,
+                                                int positionOfFitterParent,
+                                                boolean includeConnectionsFromLessFitParent) {
+        int positionOfStructure = currentStructures.indexOfUniqueNonNullElement();
+        T structure = currentStructures.get(positionOfStructure);
 
-        return list;
+        if (positionOfStructure == positionOfFitterParent || includeConnectionsFromLessFitParent) {
+            offspringBuilder.addStructure(structure);
+        }
     }
 
-    /**
-     * Returns a list of the innovation numbers of the given objects. If one of the objects is null, the returned
-     * list will be null at that position.
-     */
-    private <T extends InnovationNumberObject> List<Integer> tryGetInnovationNumbers(List<T> structures) {
-        List<Integer> innovationNumbers = new ArrayList<>();
-        Integer innovationNumber0 = structures.get(0) == null? null : structures.get(0).getInnovationNumber();
-        Integer innovationNumber1 = structures.get(1) == null? null : structures.get(1).getInnovationNumber();
-
-        innovationNumbers.add(innovationNumber0);
-        innovationNumbers.add(innovationNumber1);
-
-        return innovationNumbers;
-    }
-
-    private <T> void handleMatchingStructure(OffspringBuilder offspringBuilder,
-                                          List<T> currentStructures, DoubleIndex doubleIndex) {
-        T structure = RandomUtil.sampleFrom(currentStructures);
+    private <T> void handleMatchingStructure(OffspringBuilder offspringBuilder, Pair<T> currentStructures) {
+        T structure = RandomUtil.sampleFrom(currentStructures.toList());
         offspringBuilder.addStructure(structure);
-        doubleIndex.increaseAll();
-    }
-
-    private <T> void handleNonMatchingStructure(OffspringBuilder offspringBuilder,
-                                             List<T> currentStructures, DoubleIndex doubleIndex,
-                                             List<Integer> innovationNumbers, int positionOfFitterParent,
-                                             boolean includeConnectionsFromLessFitParent) {
-        int positionOfYoungerStructure = determinePositionOfYoungerStructure(innovationNumbers);
-
-        if (positionOfYoungerStructure == positionOfFitterParent || includeConnectionsFromLessFitParent) {
-            T youngerStructure = currentStructures.get(positionOfYoungerStructure);
-            offspringBuilder.addStructure(youngerStructure);
-        }
-        doubleIndex.increaseAt(positionOfYoungerStructure);
-    }
-
-    private int determinePositionOfYoungerStructure(List<Integer> currentInnovationNumbers) {
-        Integer id0 = currentInnovationNumbers.get(0);
-        Integer id1 = currentInnovationNumbers.get(1);
-
-        if (id0 == null){
-            return 1;
-        } else if (id1 == null) {
-            return 0;
-        } else if (id0 < id1) {
-            return 0;
-        } else if (id1 < id0) {
-            return 1;
-        } else {
-            throw new AssertionError("Both structures have the same innovation number.");
-        }
     }
 
 }
