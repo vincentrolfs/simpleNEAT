@@ -7,7 +7,7 @@ import simpleNEAT.NeuralNetwork.Node;
 
 import java.util.*;
 
-class NetworkCreator {
+public class NetworkCreator {
 
     private int _amountInputNodes;
     private int _amountOutputNodes;
@@ -42,7 +42,7 @@ class NetworkCreator {
      * @param nodeActivationSteepnessMin                        Must satisfy {@code nodeActivationSteepnessMin <= nodeActivationSteepnessMax}.
      * @param amountOfGenerationsRememberedForInnovationNumbers Must be non-negative.
      */
-    NetworkCreator(int amountInputNodes, int amountOutputNodes, double connectionWeightMin, double connectionWeightMax, double defaultConnectionWeight, double nodeBiasMin, double nodeBiasMax, double defaultNodeBias, double nodeActivationSteepnessMin, double nodeActivationSteepnessMax, double defaultNodeActivationSteepness, int amountOfGenerationsRememberedForInnovationNumbers) {
+    public NetworkCreator(int amountInputNodes, int amountOutputNodes, double connectionWeightMin, double connectionWeightMax, double defaultConnectionWeight, double nodeBiasMin, double nodeBiasMax, double defaultNodeBias, double nodeActivationSteepnessMin, double nodeActivationSteepnessMax, double defaultNodeActivationSteepness, int amountOfGenerationsRememberedForInnovationNumbers) {
         assert amountInputNodes >= 1 &&
                 amountOutputNodes >= 1 &&
                 connectionWeightMin <= connectionWeightMax &&
@@ -148,7 +148,7 @@ class NetworkCreator {
      * @param nodeOutOfId Must be non-negative.
      * @param nodeIntoId  Must be non-negative.
      */
-    Connection createConnectionWithDefaultWeight(int nodeOutOfId, int nodeIntoId) {
+    public Connection createConnectionWithDefaultWeight(int nodeOutOfId, int nodeIntoId) {
         return createConnectionWithGivenWeight(nodeOutOfId, nodeIntoId, _defaultConnectionWeight);
     }
 
@@ -164,7 +164,7 @@ class NetworkCreator {
     /**
      * Creates a new network consisting only of input and output nodes with default attributes, and no connections.
      */
-    NeuralNetwork createMinimalNeuralNetwork() {
+    public NeuralNetwork createMinimalNeuralNetwork() {
         LinkedList<Node> nodes = createMinimalNodeList();
         LinkedList<Connection> connections = new LinkedList<>();
 

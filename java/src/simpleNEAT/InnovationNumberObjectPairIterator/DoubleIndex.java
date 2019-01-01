@@ -15,15 +15,15 @@ class DoubleIndex {
 
     /**
      * Requires {@code this.isPartlyInRange(pairOfLists)}
-     * @return The pair of the elements the given lists yield when evaluated at the position given by this multiindex. If one of the indices
+     * @return The pair of elements the given lists yield when accessed at the positions given by this multiindex. If one of the indices
      * in the multiindex is not in the range of the corresponding list, {@code null} is put at that position.
      */
     <T> Pair<T> getValuesOf(Pair<List<T>> pairOfLists) {
         assert this.isPartlyInRange(pairOfLists) : "Multiindex is not partly in range of the pair of lists.";
 
         return new Pair<>(
-                tryGetSingleValue(pairOfLists.get(0), _indices[0]),
-                tryGetSingleValue(pairOfLists.get(1), _indices[1])
+                getSingleValueOf(pairOfLists.get(0), _indices[0]),
+                getSingleValueOf(pairOfLists.get(1), _indices[1])
         );
     }
 
@@ -51,7 +51,7 @@ class DoubleIndex {
         _indices[position]++;
     }
 
-    private <T> T tryGetSingleValue(List<T> list, int index){
+    private <T> T getSingleValueOf(List<T> list, int index){
         if (index < list.size()){
             return list.get(index);
         } else {
