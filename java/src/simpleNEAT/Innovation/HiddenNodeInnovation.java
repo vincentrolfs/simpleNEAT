@@ -12,7 +12,7 @@ public class HiddenNodeInnovation extends Innovation {
         super(generationCreated);
         assert connectionSplitId >= 0;
 
-        this._connectionSplitId = connectionSplitId;
+        _connectionSplitId = connectionSplitId;
     }
 
     @Override

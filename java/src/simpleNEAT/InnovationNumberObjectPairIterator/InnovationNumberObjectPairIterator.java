@@ -22,12 +22,12 @@ public class InnovationNumberObjectPairIterator<T extends InnovationNumberObject
 
     @Override
     public Pair<T> next() {
-        if (!this.hasNext()){
+        if (!hasNext()){
             throw new NoSuchElementException();
         }
 
         Pair<T> nextPair = _index.getValuesOf(_elements);
-        return this.convertNextPairAndAdjustIndex(nextPair);
+        return convertNextPairAndAdjustIndex(nextPair);
     }
 
     private Pair<T> convertNextPairAndAdjustIndex(Pair<T> nextPair){

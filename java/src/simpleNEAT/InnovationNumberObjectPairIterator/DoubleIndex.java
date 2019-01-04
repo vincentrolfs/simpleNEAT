@@ -19,7 +19,7 @@ class DoubleIndex {
      * in the multiindex is not in the range of the corresponding list, {@code null} is put at that position.
      */
     <T> Pair<T> getValuesOf(Pair<List<T>> pairOfLists) {
-        assert this.isPartlyInRange(pairOfLists) : "Multiindex is not partly in range of the pair of lists.";
+        assert isPartlyInRange(pairOfLists) : "Multiindex is not partly in range of the pair of lists.";
 
         return new Pair<>(
                 getSingleValueOf(pairOfLists.get(0), _indices[0]),

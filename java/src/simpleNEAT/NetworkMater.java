@@ -64,7 +64,7 @@ public class NetworkMater {
         assert inclusionOfConnectionsFromLessFitParentProbability >= 0 &&
                 inclusionOfConnectionsFromLessFitParentProbability <= 1;
 
-        this._inclusionOfConnectionsFromLessFitParentProbability = inclusionOfConnectionsFromLessFitParentProbability;
+        _inclusionOfConnectionsFromLessFitParentProbability = inclusionOfConnectionsFromLessFitParentProbability;
     }
 
     NeuralNetwork createOffspring(NeuralNetwork parent0, NeuralNetwork parent1) {

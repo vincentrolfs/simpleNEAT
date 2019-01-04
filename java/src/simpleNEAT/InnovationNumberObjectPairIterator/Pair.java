@@ -32,7 +32,7 @@ public class Pair<T> {
      * @return The index of the unique element in the pair that is not null.
      */
     public int indexOfUniqueNonNullElement(){
-        assert this.hasNullElement() : "The pair does not contain a unique non-null element.";
+        assert hasNullElement() : "The pair does not contain a unique non-null element.";
         T object0 = _listOfElements.get(0);
 
         if (object0 != null){
