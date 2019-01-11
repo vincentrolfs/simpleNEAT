@@ -6,6 +6,7 @@ import simpleNEAT.NeuralNetwork.Connection;
 import simpleNEAT.NeuralNetwork.NeuralNetwork;
 import simpleNEAT.NeuralNetwork.Node;
 import java.util.List;
+import java.util.Set;
 
 public class NetworkComparator {
 

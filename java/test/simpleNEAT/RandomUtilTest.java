@@ -3,8 +3,7 @@ package simpleNEAT;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -76,5 +75,39 @@ class RandomUtilTest {
 
         // 99,7%-confidence interval
         assertEquals(5000, amountA, 150);
+    }
+
+    @Test
+    void sampleMultipleFromDistributesEvenly2() {
+        List<Integer> list = new ArrayList<>();
+        Map<Set<Integer>, Integer> resultCounts = new HashMap<>();
+        list.add(1);
+        list.add(2);
+        list.add(3);
+        list.add(4);
+        list.add(5);
+        list.add(6);
+
+        for (int i = 0; i < 10000; i++) {
+            Set<Integer> result = RandomUtil.sampleMultipleFrom(list, 2);
+
+            if (resultCounts.containsKey(result)){
+                resultCounts.put(result, resultCounts.get(result) + 1);
+            } else {
+                resultCounts.put(result, 1);
+            }
+        }
+
+        assertEquals(15, resultCounts.size());
+        double expectedCount = 10000.0 / 15.0;
+        double chiSquared = 0;
+
+        for (Set<Integer> result : resultCounts.keySet()) {
+            int count = resultCounts.get(result);
+            chiSquared += Math.pow(count - expectedCount, 2) / expectedCount;
+        }
+
+        // 99,5% confidence
+        assertTrue(chiSquared <= 31.32, "chiSquared was too big: " + chiSquared);
     }
 }
